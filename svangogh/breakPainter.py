@@ -24,8 +24,8 @@ def main():
 			Ins = Insertion()
 			Ins.findInsertions(READS)
 			if Ins.size==None: Ins.size=0
-			if Ins.leftClip==None: Ins.leftClip=leftBreak
-			if Ins.rightClip==None: Ins.rightClip=rightBreak
+			if Ins.leftClip==None: Ins.leftClip=SV.start
+			if Ins.rightClip==None: Ins.rightClip=SV.end
 			Bosch.drawInsertionCanvas(Ins.leftClip,Ins.rightClip,Ins.size)
 			Bosch.insertionPainter(READS,Ins)
 			Bosch.orderPixelsInsertion()
