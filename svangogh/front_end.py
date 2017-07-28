@@ -1,0 +1,66 @@
+#!/usr/env python
+import os,argparse,sys
+from argparse import RawTextHelpFormatter
+from SV import SV
+class Arguments():
+	def __init__(self):
+		splash='svangogh     --paint SV breakpoints--\n'
+		parser = argparse.ArgumentParser(description=splash,formatter_class=RawTextHelpFormatter)
+		reqArgs = parser.add_argument_group('required arguments')
+		pixArgs = parser.add_argument_group('SV painting arguments')
+		optArgs = parser.add_argument_group('Optional arguments')
+		reqArgs.add_argument('-i', help='BAM file',required=True,type=str)
+		pixArgs.add_argument('-r', help='Breakpoint <chr:start-end>',required=False,type=str,default=None)
+		pixArgs.add_argument('-b', help='Breakpoint BED file, tab-delimited, <chr start end type>',required=False,type=str,default=None)
+		pixArgs.add_argument('-v', help='VCF file',required=False,type=str,default=None)
+		pixArgs.add_argument('-t', help='SV type <DEL|DUP|INV|INS>',required=False,type=str) 
+		pixArgs.add_argument('-c', help='Maximum clipped distance to breakpoint. Default:50',required=False,type=int,default=50)
+		pixArgs.add_argument('-f', help='Flanking bp to paint. Default 20',required=False,type=int,default=20)
+		optArgs.add_argument('-ci',help='Search for clips within confidence intervals. Requires VCF. Overrides <-c>',required=False,default=False,action='store_true')
+		optArgs.add_argument('-w', help='Flanking bp to search for supporting reads. Default 100',required=False,type=int,default=100)
+		optArgs.add_argument('-o','-out', help='output',required=False,default="breakPainter.txt",type=str)
+		args = parser.parse_args()
+		self.ifh = args.i
+		region = args.r
+		bed=args.b
+		vcf=args.v
+		self.breakType=args.t
+		self.maxClip = args.c 
+		self.maxFlank = args.f
+		self.ci, self.windowFlank, self.ofh = args.ci, args.w,args.o
+		if region == None and bed ==None and vcf==None:
+			sys.stderr.write('FATAL ERROR: Please supply either a region <-r chr:start-end> or a BED file <-b> or a VCF file <-v>\n')
+			sys.exit(1)
+		if region != None and bed==None and self.breakType==None and vcf==None:
+			sys.stderr.write('FATAL ERROR: Please define the SV type <-t <DEL|DUP|INV|INS>\n')
+			sys.exit(1)
+		regions=[]
+		if bed !=None:
+			with open(bed,'r') as f:
+				for l in f:
+					a = l.rstrip('\n').split('\t')
+					sv = SV(a[0],a[1],a[2],a[3],(-1*self.maxClip,self.maxClip),(-1*self.maxClip,self.maxClip))
+					if sv.qc==1: regions.append(sv)	
+		if region!=None:
+			c,p = region.split(':')
+			s,e = p.split('-')
+			sv = SV(c,s,e,self.breakType,(-1*self.maxClip,self.maxClip),(-1*self.maxClip,self.maxClip))
+			if sv.qc==1: regions.append(sv)		
+		if vcf != None:
+			with open(vcf,'r') as f:
+				for l in f:
+			       		if l.startswith('#'): continue
+					c=str(r[0])
+					s=int(r[1])
+					s-=1
+					e=0
+					svtype=None
+					leftCI, rightCI  = (-1*self.maxClip, self.maxClip), (-1*self.maxClip,self.maxClip)
+					for i in r[7].split(';'):
+						if 'SVTYPE=' in i: svtype=i.replace('SVTYPE=','')
+						if i.startswith('END='): e=int(i.replace('END=',''))
+						if self.ci==True and i.startswith('CIPOS='): leftCI=tuple(map(int,i.replace('CIPOS=','').split(',')))
+						if self.ci==True and i.startswith('CIEND='): rightCI=tuple(map(int,i.replace('CIEND=','').split(',')))
+					sv = SV(c,s,e,svtype,leftCI,rightCI)
+					if sv.qc==1: regions.append(sv)
+		self.regions=regions	

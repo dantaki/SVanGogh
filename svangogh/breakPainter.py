@@ -1,0 +1,32 @@
+#!/usr/env python
+from Bam import Bam
+from Cigar import Cigar
+from Alignment import Alignment
+from Read import Read
+from Insertion import Insertion
+from Painter import Painter
+from front_end import Arguments
+def main():
+	Args=Arguments()
+	for SV in Args.regions:
+		##### ITERATE READS #####
+		bam = Bam(Args.ifh)
+		bam.leftFlank(SV,Args)
+		if SV.svtype=='DEL' or SV.svtype =='DUP' or SV.svtype == 'INV': bam.rightFlank(SV,Args)
+		#########################
+		READS = bam.reads
+		Bosch=Painter(Args.maxFlank)
+		if SV.svtype!='INS':
+			Bosch.drawCanvas(SV.leftCI,SV.rightCI)
+			Bosch.svPainter(READS)
+			Bosch.orderPixels()
+		else: 
+			Ins = Insertion()
+			Ins.findInsertions(READS)
+			if Ins.size==None: Ins.size=0
+			if Ins.leftClip==None: Ins.leftClip=leftBreak
+			if Ins.rightClip==None: Ins.rightClip=rightBreak
+			Bosch.drawInsertionCanvas(Ins.leftClip,Ins.rightClip,Ins.size)
+			Bosch.insertionPainter(READS,Ins)
+			Bosch.orderPixelsInsertion()
+		Bosch.printPixels(SV,Args.ofh)
