@@ -164,9 +164,9 @@ class Painter():
                 for x in self.reversePix:
                         if x not in self.insertionReads and x not in self.clippedReads and x not in self.bridgingReads: self.readPix.append(self.reversePix[x])
 	def printPixels(self,SV,o):
-		unscaled='{}_{}_{}_{}_unscaled.png'.format(o,SV.chrom,SV.start,SV.end,SV.svtype)
-		scaled='{}_{}_{}_{}_scaled.png'.format(o,SV.chrom,SV.start,SV.end,SV.svtype)
-		dat='{}_{}_{}_{}_pixels.txt'.format(o,SV.chrom,SV.start,SV.end,SV.svtype)
+		unscaled='{}_{}_{}_{}_{}_unscaled.png'.format(o,SV.chrom,SV.start,SV.end,SV.svtype)
+		scaled='{}_{}_{}_{}_{}_scaled.png'.format(o,SV.chrom,SV.start,SV.end,SV.svtype)
+		dat='{}_{}_{}_{}_{}_pixels.txt'.format(o,SV.chrom,SV.start,SV.end,SV.svtype)
 		img_unscaled=smp.toimage(self.readPix)
 		img_scaled=smp.toimage(smp.imresize(self.readPix,(self.iheight,self.iwidth)))
 		img_unscaled.save(unscaled)

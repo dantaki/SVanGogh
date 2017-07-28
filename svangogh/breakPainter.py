@@ -29,4 +29,4 @@ def main():
 			Bosch.drawInsertionCanvas(Ins.leftClip,Ins.rightClip,Ins.size)
 			Bosch.insertionPainter(READS,Ins)
 			Bosch.orderPixelsInsertion()
-		Bosch.printPixels(SV,Args.ofh)
+		if len(Bosch.readPix)>0: Bosch.printPixels(SV,Args.ofh)
