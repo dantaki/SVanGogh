@@ -14,8 +14,8 @@ def overlap(s1,e1,s2,e2):
 	return o[0]
 def getBreak(s1,e1,s2,e2,svType):
 	a = sorted([s1,e1,s2,e2])
-	if svType=='DEL' or svType=='INV' or (svtype=='DUP' and isOverlapping(s1,e2,s2,e2)==True): return a[1],a[2]
-	elif svType=='DUP' and isOVerlapping(s1,e2,s2,e2)==False: return a[0],a[3]
+	if svtype=='DEL' or svtype=='INV' or (svtype=='DUP' and isOverlapping(s1,e2,s2,e2)==True): return a[1],a[2]
+	elif svtype=='DUP' and isOverlapping(s1,e2,s2,e2)==False: return a[0],a[3]
 class Alignment():
 	def __init__(self):
 		self.pos=[None]
