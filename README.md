@@ -1,6 +1,18 @@
 # SVanGogh
 Pixelate SVs!
 
+## Install
+
+`pip install https://github.com/dantaki/SVanGogh/releases/tag/v0.1`
+
+#### Requires:
+
+* pysam
+* pybedtools
+* scipy
+
+## Usage
+
 ```
 $ svangogh --help
 
@@ -34,3 +46,9 @@ svangogh creates three output files for each SV:
 * PNG image of the SV, unscaled
 
 The prefix of the output file defined by the `<-o output>` argument
+
+## Contact
+
+This is an alpha release of svangogh. Use at your own risk:exclamation:
+
+Author: Danny Antaki `dantaki@ucsd.edu`
