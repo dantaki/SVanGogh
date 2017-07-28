@@ -50,6 +50,7 @@ class Arguments():
 			with open(vcf,'r') as f:
 				for l in f:
 			       		if l.startswith('#'): continue
+					r = l.rstrip('\n').split('\t')
 					c=str(r[0])
 					s=int(r[1])
 					s-=1
