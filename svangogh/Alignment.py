@@ -1,6 +1,7 @@
 #!/usr/env python
 from pybedtools import BedTool as Bed
 from Cigar import Cigar
+import numpy as np
 def isOverlapping(s1,e1,s2,e2): 
 	s=sorted([s1,s2])
 	e=sorted([e1,e2])
