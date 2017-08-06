@@ -14,11 +14,11 @@ class Arguments():
 		pixArgs.add_argument('-b', help='Breakpoint BED file, tab-delimited, <chr start end type>',required=False,type=str,default=None)
 		pixArgs.add_argument('-v', help='VCF file',required=False,type=str,default=None)
 		pixArgs.add_argument('-t', help='SV type <DEL|DUP|INV|INS>',required=False,type=str) 
-		pixArgs.add_argument('-c', help='Maximum clipped distance to breakpoint. Default:50',required=False,type=int,default=50)
-		pixArgs.add_argument('-f', help='Flanking bp to paint. Default 20',required=False,type=int,default=20)
+		pixArgs.add_argument('-c', help='Maximum clipped distance to breakpoint. [50]',required=False,type=int,default=50)
+		pixArgs.add_argument('-f', help='Flanking bp to paint. [20]',required=False,type=int,default=20)
 		optArgs.add_argument('-ci',help='Search for clips within confidence intervals. Requires VCF. Overrides <-c>',required=False,default=False,action='store_true')
-		optArgs.add_argument('-w', help='Flanking bp to search for supporting reads. Default 100',required=False,type=int,default=100)
-		optArgs.add_argument('-o','-out', help='output',required=False,default="breakPainter.txt",type=str)
+		optArgs.add_argument('-w', help='Flanking bp to search for supporting reads. [100]',required=False,type=int,default=100)
+		optArgs.add_argument('-o','-out', help='output',required=False,default="breakPainter",type=str)
 		args = parser.parse_args()
 		self.ifh = args.i
 		region = args.r
