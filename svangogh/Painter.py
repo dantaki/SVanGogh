@@ -40,7 +40,11 @@ class Painter():
 		### IMAGE SCALING ###
 		self.iwidth=800
 		self.iheight=300
-	def drawCanvas(self,leftCI,rightCI):
+	def drawCanvas(self,leftClip,rightClip):
+		for x in range(leftClip-self.flank,leftClip+self.flank): self.canvas.append(x)
+		for x in range(rightClip-self.flank,rightClip+self.flank): self.canvas.append(x)
+		self.canvasLeftMin,self.canvasRightMin=leftClip-self.flank, rightClip-self.flank
+	def drawCanvasCI(self,leftCI,rightCI):
 		for x in range(leftCI[0]-self.flank,leftCI[1]+self.flank): self.canvas.append(x)
 		for x in range(rightCI[0]-self.flank,rightCI[1]+self.flank): self.canvas.append(x)
 		self.canvasLeftMin,self.canvasRightMin=leftCI[0]-self.flank, rightCI[1]-self.flank

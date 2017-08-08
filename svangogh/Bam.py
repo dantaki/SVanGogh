@@ -3,6 +3,7 @@ import pysam
 from Alignment import Alignment
 from Cigar import Cigar
 from Read import Read
+import numpy as np
 def unionize(reads,qname,qAln):
 	if reads.get(qname)!= None:
 		read = reads[qname]
@@ -20,6 +21,8 @@ class Bam():
 		self.bam = pysam.AlignmentFile(ifh,'rb')
 		self.reads=None
 		self.clips=None
+		self.medLeftClip=None
+		self.medRightClip=None
 	def leftFlank(self,SV,Args):
 		READS={}
 		CLIPS=[]
@@ -69,3 +72,5 @@ class Bam():
 			READS=unionize(READS,al.query_name,qAln)
 		self.clips=CLIPS
 		self.reads=READS
+	def medianClip(self):
+		self.medLeftClip, self.medRightClip = int(np.median([x[0] for x in self.clips if x[0] != None])), int(np.median([x[1] for x in self.clips if x[1] != None]))	

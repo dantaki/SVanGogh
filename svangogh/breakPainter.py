@@ -6,7 +6,6 @@ from Read import Read
 from Insertion import Insertion
 from Painter import Painter
 from front_end import Arguments
-import numpy as np
 def main():
 	Args=Arguments()
 	for SV in Args.regions:
@@ -16,10 +15,14 @@ def main():
 		if SV.svtype=='DEL' or SV.svtype =='DUP' or SV.svtype == 'INV': bam.rightFlank(SV,Args)
 		#########################
 		READS = bam.reads
-		print np.median([x[0] for x in bam.clips if x[0] !=None]) 
+		bam.medianClip()
 		Bosch=Painter(Args.maxFlank)
 		if SV.svtype!='INS':
-			Bosch.drawCanvas(SV.leftCI,SV.rightCI)
+			#Bosch.drawCanvas(SV.leftCI,SV.rightCI)
+			if SV.svtype=='DEL' or SV.svtype=='INV':
+				Bosch.drawCanvas(bam.medRightClip,bam.medLeftClip)
+			elif SV.svtype=='DUP': 
+				Bosch.drawCanvas(bam.medLeftClip,bam.medRightClip)
 			Bosch.svPainter(READS)
 			Bosch.orderPixels()
 		else: 
