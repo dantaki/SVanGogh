@@ -1,7 +1,8 @@
 #!/usr/env python
-import os,argparse,sys
+import os,argparse,sys,subprocess
 from argparse import RawTextHelpFormatter
 from SV import SV
+import pysam
 class Arguments():
 	def __init__(self):
 		splash='svangogh     --paint SV breakpoints--\n'
@@ -20,6 +21,7 @@ class Arguments():
 		svArgs.add_argument('-c', help='Maximum clipped distance to breakpoint. [50]',required=False,type=int,default=50)
 		pixArgs.add_argument('-f', help='Flanking bp to paint. [20]',required=False,type=int,default=20)
 		pixArgs.add_argument('-n', help='Maximum number of reads to paint. [10]',required=False,type=int,default=10)
+		pixArgs.add_argument('-m', help='Maximum MAPQ. [Maximum in sample of reads]',required=False,type=int,default=None)
 		optArgs.add_argument('-o','-out', help='output',required=False,default="breakPainter",type=str)
 		args = parser.parse_args()
 		self.ifh = args.i
@@ -27,6 +29,7 @@ class Arguments():
 		bed=args.b
 		vcf=args.v
 		self.maxReads=args.n
+		self.maxMapq=args.m
 		self.breakType=args.t
 		self.maxClip = args.c 
 		self.maxFlank = args.f

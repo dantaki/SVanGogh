@@ -23,7 +23,7 @@ def appendOrder(i,o,t):
 	for x in sorted(i, key=itemgetter(0)):
 		if x[1] in t: o.append(x[1])
 class Painter():
-	def __init__(self,maxFlank):
+	def __init__(self,maxFlank,maxMapq):
 		self.canvas=[]
 		self.flank=maxFlank
 		self.canvasLeftMin=None
@@ -40,7 +40,7 @@ class Painter():
 		### RED CHANNEL ###
 		self.unmapped=0
 		### BLUE CHANNEL ###
-		self.mapqFunc=4.25
+		self.mapqFunc=255.0/maxMapq
 		### GREEN CHANNEL ###
 		self.strandMatch=255
 		self.strandDif=127.5
@@ -66,6 +66,7 @@ class Painter():
 		mapq = self.mapqFunc*mapq
 		if mapq > 255: mapq=255
 		return mapq
+	def zeroPix(self): return [[0,0,0] for x in self.canvas]
 	def svPainter(self,reads):
 		self.mapped=50
 		self.clip=255
@@ -130,7 +131,8 @@ class Painter():
 		if len(self.oneClip)>0: appendOrder(self.oneClip,self.order,self.diffPix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.diffPix)
 		for x in self.order[0:MAX-1]: self.readPix.append(self.pix[x])
-	def orderPixelsInversion(self):
+		for x in range(MAX-len(self.readPix)): self.readPix.append(self.zeroPix())
+	def orderPixelsInversion(self,MAX):
 		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.diffPix)
 		if len(self.oneClip)>0: appendOrder(self.oneClip,self.order,self.diffPix)
 		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.samePix)
@@ -138,6 +140,7 @@ class Painter():
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.samePix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.diffPix)
 		for x in self.order[0:MAX-1]: self.readPix.append(self.pix[x])
+		for x in range(MAX-len(self.readPix)): self.readPix.append(self.zeroPix())
 	def orderPixelsInsertion(self):
 		for x in self.samePix:
 			if x in self.insertionReads and x in self.clippedReads and x in self.bridgingReads: self.readPix.append(self.samePix[x])

@@ -15,8 +15,8 @@ def main():
 		if SV.svtype=='DEL' or SV.svtype =='DUP' or SV.svtype == 'INV': bam.rightFlank(SV,Args)
 		#########################
 		READS = bam.reads
-		bam.pixelPrep()
-		Bosch=Painter(Args.maxFlank)
+		bam.pixelPrep(SV,Args)
+		Bosch=Painter(Args.maxFlank,Args.maxMapq)
 		if SV.svtype!='INS':
 			#Bosch.drawCanvas(SV.leftCI,SV.rightCI)
 			if SV.svtype=='DEL' or SV.svtype=='INV':

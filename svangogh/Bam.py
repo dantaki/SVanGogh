@@ -72,11 +72,21 @@ class Bam():
 			READS=unionize(READS,al.query_name,qAln)
 		self.clips=CLIPS
 		self.reads=READS
-	def pixelPrep(self):
-		self.medianClip()
+	def pixelPrep(self,SV,Args):
+		self.maxMapq(Args)
+		self.medianClip(SV)
 		self.assignClips()
-	def medianClip(self):
-		self.medLeftClip, self.medRightClip = int(np.median([x[0] for x in self.clips if x[0] != None])), int(np.median([x[1] for x in self.clips if x[1] != None]))
+	def medianClip(self,SV):
+		left = [x[0] for x in self.clips if x[0] != None]
+		right= [x[1] for x in self.clips if x[1] != None]
+		if len(left)>0: self.medLeftClip=int(np.median(left))
+		else:
+			if SV.svtype=='DUP': self.medLeftClip=SV.start
+			if SV.svtype=='DEL' or SV.svtype=='INV': self.medLeftClip=SV.end
+		if len(right)>0: self.medRightClip=int(np.median(right))
+		else: 
+			if SV.svtype=='DUP': self.medRightClip=SV.end
+			if SV.svtype=='DEL' or SV.svtype=='INV': self.medRightClip=SV.start
 	def assignClips(self):
 		for name in self.reads:
 			Read=self.reads[name]
@@ -86,5 +96,11 @@ class Bam():
 				if Aln.rightClip!=None: rightClip.append(abs(Aln.rightClip-self.medRightClip))
 			if len(leftClip)>0: Read.leftClip=sorted(leftClip).pop(0)	
 			if len(rightClip)>0: Read.rightClip=sorted(rightClip).pop(0)
-			
-				
+	def maxMapq(self,Args):
+		c=0;
+		maxQ=0
+		for al in self.bam.fetch(until_eof=True):
+			c+=1
+			if c>5000: break
+			if al.mapping_quality>maxQ: maxQ=al.mapping_quality
+		Args.maxMapq=maxQ	
