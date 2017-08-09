@@ -35,8 +35,10 @@ class Painter():
 		### BLUE CHANNEL ###
 		self.mapqFunc=4.25
 		### GREEN CHANNEL ###
-		self.forward=127.5
-		self.reverse=255
+		self.strandMatch=255
+		self.strandDif=127.5
+		#self.forward=127.5
+		#self.reverse=255
 		### IMAGE SCALING ###
 		self.iwidth=800
 		self.iheight=300
@@ -63,13 +65,13 @@ class Painter():
 		for name in reads:
 			Read=reads[name]
 			Read.readPosition()
+			Read.countStrands()
 			if Read.left >= self.canvasLeftMin and Read.right >= self.canvasRightMin:self.bridgingReads.append(name)
-			masterStrand=Read.alignments[0].strand
 			for Aln in Read.alignments:
 				tmp=[]
 				mapq=self.transformMapq(Aln.mapq)
-				strandPix=self.forward
-				if Aln.strand=='-':strandPix=self.reverse  
+				strandPix=self.strandMatch
+				if Read.strandPix != Aln.strand: strandPix=self.strandDif
 				for x in self.canvas:
 					if x==Aln.leftClip or x==Aln.rightClip:
 						tmp.append([self.clip,mapq,strandPix])
@@ -78,7 +80,7 @@ class Painter():
 						tmp.append([self.mapped,mapq,strandPix])
 					elif x not in Aln.pos:
 						tmp.append([self.unmapped,self.unmapped,self.unmapped])
-				if masterStrand=='+': 
+				if Read.strandPix == Aln.strand: 
 					if self.forwardPix.get(name)==None: self.forwardPix[name]=tmp			
 					else: self.forwardPix[name]=pixelUnion(tmp,self.forwardPix[name])
 				else:
