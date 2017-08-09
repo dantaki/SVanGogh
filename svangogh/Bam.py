@@ -72,5 +72,19 @@ class Bam():
 			READS=unionize(READS,al.query_name,qAln)
 		self.clips=CLIPS
 		self.reads=READS
+	def pixelPrep(self):
+		self.medianClip()
+		self.assignClips()
 	def medianClip(self):
-		self.medLeftClip, self.medRightClip = int(np.median([x[0] for x in self.clips if x[0] != None])), int(np.median([x[1] for x in self.clips if x[1] != None]))	
+		self.medLeftClip, self.medRightClip = int(np.median([x[0] for x in self.clips if x[0] != None])), int(np.median([x[1] for x in self.clips if x[1] != None]))
+	def assignClips(self):
+		for name in self.reads:
+			Read=self.reads[name]
+			leftClip,rightClip=[],[]
+			for Aln in Read.alignments:
+				if Aln.leftClip!=None: leftClip.append(abs(Aln.leftClip-self.medLeftClip))
+				if Aln.rightClip!=None: rightClip.append(abs(Aln.rightClip-self.medRightClip))
+			if len(leftClip)>0: Read.leftClip=sorted(leftClip).pop(0)	
+			if len(rightClip)>0: Read.rightClip=sorted(rightClip).pop(0)
+			
+				

@@ -15,7 +15,7 @@ def main():
 		if SV.svtype=='DEL' or SV.svtype =='DUP' or SV.svtype == 'INV': bam.rightFlank(SV,Args)
 		#########################
 		READS = bam.reads
-		bam.medianClip()
+		bam.pixelPrep()
 		Bosch=Painter(Args.maxFlank)
 		if SV.svtype!='INS':
 			#Bosch.drawCanvas(SV.leftCI,SV.rightCI)
@@ -24,7 +24,11 @@ def main():
 			elif SV.svtype=='DUP': 
 				Bosch.drawCanvas(bam.medLeftClip,bam.medRightClip)
 			Bosch.svPainter(READS)
-			Bosch.orderPixels()
+			if SV.svtype=='DEL' or SV.svtype=='DUP': 
+				Bosch.orderPixelsDelDup(Args.maxReads)
+			elif SV.svtype=='INV':
+				Bosch.orderPixelsInversion(Args.maxReads)
+			#Bosch.orderPixels()
 		else: 
 			Ins = Insertion()
 			Ins.findInsertions(READS)
