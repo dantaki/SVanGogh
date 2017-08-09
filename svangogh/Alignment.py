@@ -1,6 +1,7 @@
 #!/usr/env python
 from pybedtools import BedTool as Bed
 from Cigar import Cigar
+import numpy as np
 def isOverlapping(s1,e1,s2,e2): 
 	s=sorted([s1,s2])
 	e=sorted([e1,e2])
@@ -57,7 +58,6 @@ class Alignment():
 			if cig.rightClip!=None and leftCI[0]<=rightPos<=leftCI[1]: rightClipPos=rightPos
 		self.leftClip,self.rightClip=leftClipPos,rightClipPos
 	def chimericClip(self,pChrom,pStart,pEnd,chromBreak,leftBreak,rightBreak,svtype,salns,leftCI,rightCI):
-		"""return pos, brkS, brkE, strand"""
 		if not salns[-1].startswith('SA'): del salns[-1]
 		for saln in salns:
 			salnList = saln.split(',')
@@ -70,10 +70,13 @@ class Alignment():
 				pLeft=True
 				if pStart > sLeft: pLeft=False
 				if Bed('{} {} {}'.format(chromBreak,leftBreak,rightBreak),from_string=True).intersect(Bed('{} {} {}'.format(sRef,brkS,brkE),from_string=True),f=0.90,F=0.90).count() >0:
-					if svtype=='DUP' and isOverlapping(pStart,pEnd,sLeft,sRight)==True: 
+					if svtype=='DUP' and isOverlapping(pStart,pEnd,sLeft,sRight)==False: 
 						if pLeft==True and leftCI[0]<=brkS<=leftCI[1]: self.leftClip=brkS
-						if pLeft==False and rightCI[0]<=brkE<=rightCI[1]: slef.rightClip=brkE
-					else: 
+						if pLeft==False and rightCI[0]<=brkE<=rightCI[1]: self.rightClip=brkE
+					elif svtype=='DUP' and isOverlapping(pStart,pEnd,sLeft,sRight)==True: 
+						if pLeft==False and leftCI[0]<=brkS<=leftCI[1]: self.leftClip=brkS
+						if pLeft==True and rightCI[0]<=brkE<=rightCI[1]: self.rightClip=brkE
+					elif svtype=='DEL' or svtype=='INV':
 						if pLeft==True and leftCI[0]<=brkS<=leftCI[1]: self.rightClip=brkS
 						if pLeft==False and rightCI[0]<=brkE<=rightCI[1]: self.leftClip=brkE
 	def cigarSV(self,cig,left,breakStart,breakEnd,svtype,leftCI,rightCI):
