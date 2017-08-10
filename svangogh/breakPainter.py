@@ -6,9 +6,10 @@ from Read import Read
 from Insertion import Insertion
 from Painter import Painter
 from front_end import Arguments
+from tqdm import tqdm
 def main():
 	Args=Arguments()
-	for SV in Args.regions:
+	for SV in tqdm(Args.regions):
 		##### ITERATE READS #####
 		bam = Bam(Args.ifh)
 		bam.leftFlank(SV,Args)

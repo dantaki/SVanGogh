@@ -12,16 +12,6 @@ class Arguments():
 		pixArgs = parser.add_argument_group('SV painting arguments')
 		optArgs = parser.add_argument_group('Optional arguments')
 		reqArgs.add_argument('-i', help='BAM file',required=True,type=str)
-<<<<<<< HEAD
-		pixArgs.add_argument('-r', help='Breakpoint <chr:start-end>',required=False,type=str,default=None)
-		pixArgs.add_argument('-b', help='Breakpoint BED file, tab-delimited, <chr start end type>',required=False,type=str,default=None)
-		pixArgs.add_argument('-v', help='VCF file',required=False,type=str,default=None)
-		pixArgs.add_argument('-t', help='SV type <DEL|DUP|INV|INS>',required=False,type=str) 
-		pixArgs.add_argument('-c', help='Maximum clipped distance to breakpoint. [50]',required=False,type=int,default=50)
-		pixArgs.add_argument('-f', help='Flanking bp to paint. [20]',required=False,type=int,default=20)
-		optArgs.add_argument('-ci',help='Search for clips within confidence intervals. Requires VCF. Overrides <-c>',required=False,default=False,action='store_true')
-		optArgs.add_argument('-w', help='Flanking bp to search for supporting reads. [100]',required=False,type=int,default=100)
-=======
 		svArgs.add_argument('-r', help='Breakpoint <chr:start-end>',required=False,type=str,default=None)
 		svArgs.add_argument('-b', help='Breakpoint BED file, tab-delimited, <chr start end type>',required=False,type=str,default=None)
 		svArgs.add_argument('-v', help='VCF file',required=False,type=str,default=None)
@@ -32,7 +22,7 @@ class Arguments():
 		pixArgs.add_argument('-f', help='Flanking bp to paint. [20]',required=False,type=int,default=20)
 		pixArgs.add_argument('-n', help='Maximum number of reads to paint. [10]',required=False,type=int,default=10)
 		pixArgs.add_argument('-m', help='Maximum MAPQ. [Maximum in sample of reads]',required=False,type=int,default=None)
->>>>>>> strand_test
+		optArgs.add_argument('-V', help='Verbose. Display a progress bar.',required=False,default=False,action='store_true')
 		optArgs.add_argument('-o','-out', help='output',required=False,default="breakPainter",type=str)
 		args = parser.parse_args()
 		self.ifh = args.i
@@ -44,6 +34,7 @@ class Arguments():
 		self.breakType=args.t
 		self.maxClip = args.c 
 		self.maxFlank = args.f
+		self.verbose= args.V
 		self.ci, self.windowFlank, self.ofh = args.ci, args.w,args.o
 		if region == None and bed ==None and vcf==None:
 			sys.stderr.write('FATAL ERROR: Please supply either a region <-r chr:start-end> or a BED file <-b> or a VCF file <-v>\n')
