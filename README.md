@@ -17,7 +17,7 @@ Pixelate SVs!
 $ svangogh --help
 
 usage: svangogh [-h] -i I [-r R] [-b B] [-v V] [-t T] [-ci] [-w W] [-c C]
-                [-f F] [-n N] [-o O]
+                [-f F] [-n N] [-m M] [-V] [-o O]
 
 svangogh     --paint SV breakpoints--
 
@@ -39,8 +39,10 @@ SV arguments:
 SV painting arguments:
   -f F          Flanking bp to paint. [20]
   -n N          Maximum number of reads to paint. [10]
+  -m M          Maximum MAPQ. [Maximum in sample of reads]
 
 Optional arguments:
+  -V            Verbose. Display a progress bar.
   -o O, -out O  output
 ```
 
