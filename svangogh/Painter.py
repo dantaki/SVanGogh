@@ -122,7 +122,7 @@ class Painter():
 				else:
 					if self.diffPix.get(name)==None: self.diffPix[name]=tmp
 					else: self.diffPix[name]=pixelUnionInsertion(tmp,self.diffPix[name],self.clip1,self.clip2)
-	def orderPixelsDelDup(self,MAX):
+	def orderPixelsDelDup(self,MAX,V):
 		"""print the reads in order, for deletions and duplications"""
 		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.samePix)
 		if len(self.oneClip)>0: appendOrder(self.oneClip,self.order,self.samePix)
@@ -130,16 +130,20 @@ class Painter():
 		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.diffPix)
 		if len(self.oneClip)>0: appendOrder(self.oneClip,self.order,self.diffPix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.diffPix)
-		for x in self.order[0:MAX-1]: self.readPix.append(self.pix[x])
+		for x in self.order[0:MAX-1]: 
+			if V==True: print x
+			self.readPix.append(self.pix[x])
 		for x in range(MAX-len(self.readPix)): self.readPix.append(self.zeroPix())
-	def orderPixelsInversion(self,MAX):
+	def orderPixelsInversion(self,MAX,V):
 		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.diffPix)
 		if len(self.oneClip)>0: appendOrder(self.oneClip,self.order,self.diffPix)
 		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.samePix)
 		if len(self.oneClip)>0: appendOrder(self.oneClip,self.order,self.samePix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.samePix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.diffPix)
-		for x in self.order[0:MAX-1]: self.readPix.append(self.pix[x])
+		for x in self.order[0:MAX-1]: 
+			if V==True: print x
+			self.readPix.append(self.pix[x])
 		for x in range(MAX-len(self.readPix)): self.readPix.append(self.zeroPix())
 	def orderPixelsInsertion(self):
 		for x in self.samePix:
