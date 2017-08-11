@@ -8,11 +8,11 @@ from Painter import Painter
 from front_end import Arguments
 from tqdm import tqdm
 def main():
-Args=Arguments()
-if Args.verbose==True:
-	for SV in tqdm(Args.regions): iterator(Args,SV)
-else: 
-	for SV in Args.regions: iterator(Args,SV)
+	Args=Arguments()
+	if Args.verbose==True:
+		for SV in tqdm(Args.regions): iterator(Args,SV)
+	else: 
+		for SV in Args.regions: iterator(Args,SV)
 def iterator(Args,SV):
 	##### ITERATE READS #####
 	bam = Bam(Args.ifh)
