@@ -5,6 +5,7 @@ class Cigar():
 		"""----------------------------------------------------------------"""
 		"""Courtesy of Pysam:http://pysam.readthedocs.io/en/latest/api.html"""
 		CODE2CIGAR= ['M','I','D','N','S','H','P','=','X','B']
+		"""---------- 0   1   2   3   4   5   6   7   8   9 ---------------"""
 		#if PY_MAJOR_VERSION >= 3:
 			#CIGAR2CODE = dict([y, x] for x, y in enumerate(CODE2CIGAR))
 		#else:
@@ -13,14 +14,12 @@ class Cigar():
 		parts = CIGAR_REGEX.findall(cig)
 		self.cig=[(CIGAR2CODE[ord(y)], int(x)) for x,y in parts]
 		"""----------------------------------------------------------------"""
-		left = None
-		right = None
+		self.leftClip=False
+		self.rightClip=False
 		leftFlg, leftLen = self.cig[0]
 		rightFlg, rightLen = self.cig[-1]
-		if leftFlg == 4 or leftFlg == 5: left = leftLen
-		if rightFlg == 4 or rightFlg == 5: right = rightLen
-		self.leftClip = left
-		self.rightClip = right
+		if leftFlg == 4 or leftFlg == 5: self.leftClip=True
+		if rightFlg == 4 or rightFlg == 5: self.rightClip=True
 		self.qStart=None
 		self.qEnd=None
 	def aLen(self):

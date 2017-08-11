@@ -25,7 +25,8 @@ def iterator(Args,SV):
 	if SV.svtype!='INS':
 		#Bosch.drawCanvas(SV.leftCI,SV.rightCI)
 		if SV.svtype=='DEL' or SV.svtype=='INV':
-			Bosch.drawCanvas(bam.medRightClip,bam.medLeftClip)
+			if bam.medRightClip > bam.medLeftClip: Bosch.drawCanvas(bam.medLeftClip,bam.medRightClip)
+			else: Bosch.drawCanvas(bam.medRightClip,bam.medLeftClip)
 		elif SV.svtype=='DUP': 
 			Bosch.drawCanvas(bam.medLeftClip,bam.medRightClip)
 		Bosch.svPainter(READS)

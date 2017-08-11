@@ -35,13 +35,9 @@ class Bam():
 			##### LOAD qALN #####
 			qAln.refPos(qCig,al.reference_start,al.get_reference_positions())
 			if SV.svtype=='INS': qAln.queryPos(qCig)
-			qAln.orient(pStrand,False)
+			qAln.orient(pStrand)
 			qAln.quality(al.mapping_quality)
 			qAln.setClips(qCig,al.reference_start,al.reference_end,SV.leftCI,SV.rightCI,SV.svtype)
-			if al.has_tag('SA'):
-				tags=str(al.get_tag('SA')).split(';')
-				if SV.svtype=='DEL' or SV.svtype=='DUP' or SV.svtype=='INV':
-					qAln.chimericClip(al.reference_name,al.reference_start,al.reference_end,SV.chrom,SV.start,SV.end,SV.svtype,tags,SV.leftCI,SV.rightCI)
 			if SV.svtype=='DEL' or SV.svtype=='DUP':qAln.cigarSV(qCig.cig,al.reference_start,SV.start,SV.end,SV.svtype,SV.leftCI,SV.rightCI)
 			#####################
 			CLIPS.append((qAln.leftClip,qAln.rightClip))
@@ -59,13 +55,9 @@ class Bam():
 			qCig = Cigar(al.cigarstring)
 			##### LOAD qALN #####
 			qAln.refPos(qCig,al.reference_start,al.get_reference_positions())
-			qAln.orient(pStrand,False)
+			qAln.orient(pStrand)
 			qAln.quality(al.mapping_quality)
 			qAln.setClips(qCig,al.reference_start,al.reference_end,SV.leftCI,SV.rightCI,SV.svtype)
-			if al.has_tag('SA'):
-				tags=str(al.get_tag('SA')).split(';')
-				if SV.svtype=='DEL' or SV.svtype=='DUP' or SV.svtype=='INV':
-					qAln.chimericClip(al.reference_name,al.reference_start,al.reference_end,SV.chrom,SV.start,SV.end,SV.svtype,tags,SV.leftCI,SV.rightCI)
 			if SV.svtype=='DEL' or SV.svtype=='DUP':qAln.cigarSV(qCig.cig,al.reference_start,SV.start,SV.end,SV.svtype,SV.leftCI,SV.rightCI)
 			#####################
 			CLIPS.append((qAln.leftClip,qAln.rightClip))
@@ -80,13 +72,9 @@ class Bam():
 		left = [x[0] for x in self.clips if x[0] != None]
 		right= [x[1] for x in self.clips if x[1] != None]
 		if len(left)>0: self.medLeftClip=int(np.median(left))
-		else:
-			if SV.svtype=='DUP': self.medLeftClip=SV.start
-			if SV.svtype=='DEL' or SV.svtype=='INV': self.medLeftClip=SV.end
+		else: self.medLeftClip=SV.start
 		if len(right)>0: self.medRightClip=int(np.median(right))
-		else: 
-			if SV.svtype=='DUP': self.medRightClip=SV.end
-			if SV.svtype=='DEL' or SV.svtype=='INV': self.medRightClip=SV.start
+		else: self.medRightClip=SV.end
 	def assignClips(self):
 		for name in self.reads:
 			Read=self.reads[name]

@@ -51,7 +51,14 @@ class Painter():
 		self.iheight=300
 	def drawCanvas(self,leftClip,rightClip):
 		for x in range(leftClip-self.flank,leftClip+self.flank): self.canvas.append(x)
+		
+		flen = len(self.canvas)
+		print self.canvas[0],self.canvas[-1]
+		
 		for x in range(rightClip-self.flank,rightClip+self.flank): self.canvas.append(x)
+		
+		print self.canvas[flen],self.canvas[-1]
+
 		self.canvasLeftMin,self.canvasRightMin=leftClip-self.flank, rightClip-self.flank
 	def drawCanvasCI(self,leftCI,rightCI):
 		for x in range(leftCI[0]-self.flank,leftCI[1]+self.flank): self.canvas.append(x)
