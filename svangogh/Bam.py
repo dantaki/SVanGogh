@@ -71,9 +71,9 @@ class Bam():
 		start = [x[0] for x in self.clips if x[0] != None]
 		end= [x[1] for x in self.clips if x[1] != None]
 		if len(start)>0: self.medStart=int(np.median(start))
-		else: self.medLeftClip=SV.start
+		else: self.medStart=SV.start
 		if len(end)>0: self.medEnd=int(np.median(end))
-		else: self.medRightClip=SV.end
+		else: self.medEnd=SV.end
 	def assignClips(self):
 		for name in self.reads:
 			Read=self.reads[name]
