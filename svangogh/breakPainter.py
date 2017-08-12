@@ -20,20 +20,16 @@ def iterator(Args,SV):
 	if SV.svtype=='DEL' or SV.svtype =='DUP' or SV.svtype == 'INV': bam.rightFlank(SV,Args)
 	#########################
 	READS = bam.reads
-	bam.pixelPrep(SV,Args)
+	bam.pixelPrep(SV)
 	Bosch=Painter(Args.maxFlank,Args.maxMapq)
 	if SV.svtype!='INS':
 		#Bosch.drawCanvas(SV.leftCI,SV.rightCI)
-		if SV.svtype=='DEL' or SV.svtype=='INV':
-			if bam.medRightClip > bam.medLeftClip: Bosch.drawCanvas(bam.medLeftClip,bam.medRightClip)
-			else: Bosch.drawCanvas(bam.medRightClip,bam.medLeftClip)
-		elif SV.svtype=='DUP': 
-			Bosch.drawCanvas(bam.medLeftClip,bam.medRightClip)
-		Bosch.svPainter(READS)
+		Bosch.drawCanvas(bam.medStart,bam.medEnd)
+		Bosch.svPainter(READS,Args)
 		if SV.svtype=='DEL' or SV.svtype=='DUP': 
-			Bosch.orderPixelsDelDup(Args.maxReads,Args.verbose)
+			Bosch.orderPixelsDelDup(Args.maxReads)
 		elif SV.svtype=='INV':
-			Bosch.orderPixelsInversion(Args.maxReads,Argx.verbose)
+			Bosch.orderPixelsInversion(Args.maxReads)
 		#Bosch.orderPixels()
 	else: 
 		Ins = Insertion()

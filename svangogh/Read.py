@@ -9,16 +9,16 @@ class Read():
 		self.insertion=None
 		self.strandPix=None
 		self.sameStrand=True
-		self.leftClip=None
-		self.rightClip=None
+		self.startClip=None
+		self.endClip=None
 		self.mapq=None
 		self.score=None
 	def label(self,name): self.name=name
 	def loadAlignments(self,aln): self.alignments.append(aln)
-	def pixelPrep(self):
+	def pixelPrep(self,MAX):
 		self.readPosition()
 		self.countStrands()
-		self.medianMapq()
+		self.medianMapq(MAX)
 		self.scoreAlignments()
 	def readPosition(self):
 		self.left=self.alignments[0].pos[0]
@@ -34,12 +34,12 @@ class Read():
 		self.strandPix='+'
 		if rev > fow: self.strandPix='-'
 		if fow>0 and rev>0: self.sameStrand=False
-	def medianMapq(self):
+	def medianMapq(self,MAX):
 		q=[]
 		for Aln in self.alignments: q.append(Aln.mapq)
 		mapq=np.median(q)
-		if mapq>60:mapq=60
-		self.mapq=abs(60-mapq)
+		if mapq>MAX:mapq=MAX
+		self.mapq=abs(MAX-mapq)
 	def scoreAlignments(self): 
-		score=sum([x for x in [self.leftClip,self.rightClip] if x!= None])
-		if self.leftClip!=None or self.rightClip!=None: self.score=score
+		score=sum([x for x in [self.startClip,self.endClip] if x!= None])
+		if self.startClip!=None or self.endClip!=None: self.score=score

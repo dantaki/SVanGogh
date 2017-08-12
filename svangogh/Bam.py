@@ -21,8 +21,8 @@ class Bam():
 		self.bam = pysam.AlignmentFile(ifh,'rb')
 		self.reads=None
 		self.clips=None
-		self.medLeftClip=None
-		self.medRightClip=None
+		self.medStart=None
+		self.medEnd=None
 	def leftFlank(self,SV,Args):
 		READS={}
 		CLIPS=[]
@@ -37,10 +37,10 @@ class Bam():
 			if SV.svtype=='INS': qAln.queryPos(qCig)
 			qAln.orient(pStrand)
 			qAln.quality(al.mapping_quality)
-			qAln.setClips(qCig,al.reference_start,al.reference_end,SV.leftCI,SV.rightCI,SV.svtype)
+			qAln.setClips(qCig,al.reference_start,al.reference_end,SV.leftCI,SV.rightCI,)
 			if SV.svtype=='DEL' or SV.svtype=='DUP':qAln.cigarSV(qCig.cig,al.reference_start,SV.start,SV.end,SV.svtype,SV.leftCI,SV.rightCI)
 			#####################
-			CLIPS.append((qAln.leftClip,qAln.rightClip))
+			CLIPS.append((qAln.startClip,qAln.endClip))
 			READS=unionize(READS,al.query_name,qAln)
 		self.reads=READS
 		self.clips=CLIPS
@@ -57,38 +57,29 @@ class Bam():
 			qAln.refPos(qCig,al.reference_start,al.get_reference_positions())
 			qAln.orient(pStrand)
 			qAln.quality(al.mapping_quality)
-			qAln.setClips(qCig,al.reference_start,al.reference_end,SV.leftCI,SV.rightCI,SV.svtype)
+			qAln.setClips(qCig,al.reference_start,al.reference_end,SV.leftCI,SV.rightCI)
 			if SV.svtype=='DEL' or SV.svtype=='DUP':qAln.cigarSV(qCig.cig,al.reference_start,SV.start,SV.end,SV.svtype,SV.leftCI,SV.rightCI)
 			#####################
-			CLIPS.append((qAln.leftClip,qAln.rightClip))
+			CLIPS.append((qAln.startClip,qAln.endClip))
 			READS=unionize(READS,al.query_name,qAln)
 		self.clips=CLIPS
 		self.reads=READS
-	def pixelPrep(self,SV,Args):
-		self.maxMapq(Args)
+	def pixelPrep(self,SV):
 		self.medianClip(SV)
 		self.assignClips()
 	def medianClip(self,SV):
-		left = [x[0] for x in self.clips if x[0] != None]
-		right= [x[1] for x in self.clips if x[1] != None]
-		if len(left)>0: self.medLeftClip=int(np.median(left))
+		start = [x[0] for x in self.clips if x[0] != None]
+		end= [x[1] for x in self.clips if x[1] != None]
+		if len(start)>0: self.medStart=int(np.median(start))
 		else: self.medLeftClip=SV.start
-		if len(right)>0: self.medRightClip=int(np.median(right))
+		if len(end)>0: self.medEnd=int(np.median(end))
 		else: self.medRightClip=SV.end
 	def assignClips(self):
 		for name in self.reads:
 			Read=self.reads[name]
-			leftClip,rightClip=[],[]
+			start,end=[],[]
 			for Aln in Read.alignments:
-				if Aln.leftClip!=None: leftClip.append(abs(Aln.leftClip-self.medLeftClip))
-				if Aln.rightClip!=None: rightClip.append(abs(Aln.rightClip-self.medRightClip))
-			if len(leftClip)>0: Read.leftClip=sorted(leftClip).pop(0)	
-			if len(rightClip)>0: Read.rightClip=sorted(rightClip).pop(0)
-	def maxMapq(self,Args):
-		c=0;
-		maxQ=0
-		for al in self.bam.fetch(until_eof=True):
-			c+=1
-			if c>5000: break
-			if al.mapping_quality>maxQ: maxQ=al.mapping_quality
-		Args.maxMapq=maxQ	
+				if Aln.startClip!=None: start.append(abs(Aln.startClip-self.medStart))
+				if Aln.endClip!=None: end.append(abs(Aln.endClip-self.medEnd))
+			if len(start)>0: Read.startClip=sorted(start).pop(0)	
+			if len(end)>0: Read.endClip=sorted(end).pop(0)

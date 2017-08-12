@@ -36,6 +36,14 @@ class Arguments():
 		self.maxFlank = args.f
 		self.verbose= args.V
 		self.ci, self.windowFlank, self.ofh = args.ci, args.w,args.o
+		if self.maxMapq==None:
+			c, maxQ=0,0
+			for al in pysam.AlignmentFile(self.ifh).fetch(until_eof=True):
+				c+=1
+				if c>5000: break
+				if al.mapping_quality>maxQ: maxQ=al.mapping_quality
+			self.maxMapq=maxQ
+			if self.verbose==True: print "Maximum MAPQ in sample:{}".format(self.maxMapq)
 		if region == None and bed ==None and vcf==None:
 			sys.stderr.write('FATAL ERROR: Please supply either a region <-r chr:start-end> or a BED file <-b> or a VCF file <-v>\n')
 			sys.exit(1)
