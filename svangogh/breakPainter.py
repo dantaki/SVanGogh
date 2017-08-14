@@ -1,5 +1,5 @@
 #!/usr/env python
-from front_end import Arguments
+from Arguments import Arguments
 from Bam import Bam
 from Painter import Painter
 from tqdm import tqdm
