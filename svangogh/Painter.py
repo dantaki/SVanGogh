@@ -36,7 +36,7 @@ class Painter():
 		if Args.wscaling != None: wscale=Args.wscaling
 		if Args.hscaling != None: hscale=Args.hscaling
 		self.iwidth, self.iheight =Args.maxFlank*wscale*4, Args.maxReads*hscale
-	def drawCanvas(self,flank,startClip,endClip,svtype): self.canvas=Canvas(flank,startClip,endClip,svtype).coord
+	def drawCanvas(self,flank,startClip,endClip,hasIns): self.canvas=Canvas(flank,startClip,endClip,hasIns).coord
 	def transformMapq(self,mapq):
 		mapq = self.mapqFunc*mapq
 		if mapq > 255: mapq=255

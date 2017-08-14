@@ -25,6 +25,7 @@ class Bam():
 		self.medStart=None
 		self.medEnd=None
 		self.verbose=Args.verbose
+		self.hasIns=False
 		READS={}
 		CLIPS=[]
 		if self.verbose==True: print "processing left breakpoint"
@@ -62,13 +63,13 @@ class Bam():
 				qGap = alns[i+1][0]-alns[i][1]
 				if alns[i][2]==alns[i+1][2]:
 					if qGap >= 20: qGaps.append(qGap)
-			if len(qGaps)>0: self.reads[name].insertion=max(qGaps)
+			if len(qGaps)>0: self.hasIns,self.reads[name].insertion=True,max(qGaps)
 		if self.verbose==True: print "insertion processing complete"
 	def pixelPrep(self,SV):
 		if self.verbose==True: print "painting ..."
 		self.medianClip(SV)
 		self.assignClips()
-		if self.medStart==self.medEnd: sys.stderr.write('ERROR: median start clip:{} is equal to the median end clip:{}\n'.format(self.medStart,self.medEnd))
+		if self.medStart==self.medEnd: self.medEnd=self.medStart+1
 	def medianClip(self,SV):
 		start = [x[0] for x in self.clips if x[0] != None]
 		end= [x[1] for x in self.clips if x[1] != None]
