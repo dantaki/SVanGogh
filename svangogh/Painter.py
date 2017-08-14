@@ -1,4 +1,4 @@
-#!/usr/env python
+from Canvas import Canvas
 import scipy.misc as smp
 from operator import itemgetter
 def pixelUnion(tmp,pix):
@@ -23,11 +23,8 @@ def appendOrder(i,o,t):
 	for x in sorted(i, key=itemgetter(0)):
 		if x[1] in t: o.append(x[1])
 class Painter():
-	def __init__(self,maxFlank,maxMapq):
+	def __init__(self,Args=None):
 		self.canvas=[]
-		self.flank=maxFlank
-		self.canvasLeftMin=None
-		self.canvasRightMin=None
 		self.samePix=[] # [ReadName]=[ readPix ]
 		self.diffPix=[]
 		self.twoClip=[]
@@ -40,23 +37,21 @@ class Painter():
 		### RED CHANNEL ###
 		self.unmapped=0
 		### BLUE CHANNEL ###
-		self.mapqFunc=255.0/maxMapq
+		self.mapqFunc=255.0/Args.maxMapq
 		### GREEN CHANNEL ###
 		self.strandMatch=255
 		self.strandDif=127.5
-		#self.forward=127.5
-		#self.reverse=255
 		### IMAGE SCALING ###
-		self.iwidth=800
-		self.iheight=300
-	def drawCanvas(self,leftClip,rightClip):
-		for x in range(leftClip-self.flank,leftClip+self.flank): self.canvas.append(x)
-		for x in range(rightClip-self.flank,rightClip+self.flank): self.canvas.append(x)
-		self.canvasLeftMin,self.canvasRightMin=leftClip-self.flank, rightClip-self.flank
-	def drawCanvasCI(self,leftCI,rightCI):
-		for x in range(leftCI[0]-self.flank,leftCI[1]+self.flank): self.canvas.append(x)
-		for x in range(rightCI[0]-self.flank,rightCI[1]+self.flank): self.canvas.append(x)
-		self.canvasLeftMin,self.canvasRightMin=leftCI[0]-self.flank, rightCI[1]-self.flank
+		wscale, hscale  = Args.scaling, Args.scaling
+		if Args.wscaling != None: wscale=Args.wscaling
+		if Args.hscaling != None: hscale=Args.hscaling
+		self.iwidth, self.iheight =Args.maxFlank*wscale*4, Args.maxReads*hscale
+	def drawCanvas(self,flank,startClip,endClip): self.canvas=Canvas(flank,startClip,endClip).coord
+	# DEPRECATED
+	#def drawCanvasCI(self,leftCI,rightCI):
+	#	for x in range(leftCI[0]-self.flank,leftCI[1]+self.flank): self.canvas.append(x)
+	#	for x in range(rightCI[0]-self.flank,rightCI[1]+self.flank): self.canvas.append(x)
+	#	self.canvasLeftMin,self.canvasRightMin=leftCI[0]-self.flank, rightCI[1]-self.flank
 	def drawInsertionCanvas(self,leftClip,rightClip,iSize):
 		for x in range(leftClip-self.flank,leftClip+1): self.canvas.append(x)
 		for x in range((-1*iSize),0): self.canvas.append(x)
@@ -68,7 +63,7 @@ class Painter():
 		return mapq
 	def zeroPix(self): return [[0,0,0] for x in self.canvas]
 	def svPainter(self,reads,Args):
-		self.mapped=50
+		self.mapped=127.5
 		self.clip=255
 		for name in reads:
 			Read=reads[name]

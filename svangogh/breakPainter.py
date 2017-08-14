@@ -21,10 +21,10 @@ def iterator(Args,SV):
 	#########################
 	READS = bam.reads
 	bam.pixelPrep(SV)
-	Bosch=Painter(Args.maxFlank,Args.maxMapq)
+	Bosch=Painter(Args)
 	if SV.svtype!='INS':
 		#Bosch.drawCanvas(SV.leftCI,SV.rightCI)
-		Bosch.drawCanvas(bam.medStart,bam.medEnd)
+		Bosch.drawCanvas(Args.maxFlank,bam.medStart,bam.medEnd)
 		Bosch.svPainter(READS,Args)
 		if SV.svtype=='DEL' or SV.svtype=='DUP': 
 			Bosch.orderPixelsDelDup(Args.maxReads)

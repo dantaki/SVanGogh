@@ -22,6 +22,9 @@ class Arguments():
 		pixArgs.add_argument('-f', help='Flanking bp to paint. [20]',required=False,type=int,default=20)
 		pixArgs.add_argument('-n', help='Maximum number of reads to paint. [10]',required=False,type=int,default=10)
 		pixArgs.add_argument('-m', help='Maximum MAPQ. [Maximum in sample of reads]',required=False,type=int,default=None)
+		pixArgs.add_argument('-s', help='Scaling multiplier. Adjust the scaled image size. [5]',required=False,type=int,default=5)
+		pixArgs.add_argument('-hs', help='Height scaling multiplier. Adjust the height of the scaled image size. [5]',required=False,type=int,default=None)
+		pixArgs.add_argument('-ws', help='Width scaling multiplier. Adjust the width of the scaled image size [5]. ',required=False,type=int,default=None)
 		optArgs.add_argument('-V', help='Verbose. Display a progress bar.',required=False,default=False,action='store_true')
 		optArgs.add_argument('-o','-out', help='output',required=False,default="breakPainter",type=str)
 		args = parser.parse_args()
@@ -29,11 +32,14 @@ class Arguments():
 		region = args.r
 		bed=args.b
 		vcf=args.v
-		self.maxReads=args.n
 		self.maxMapq=args.m
 		self.breakType=args.t
 		self.maxClip = args.c 
 		self.maxFlank = args.f
+		self.maxReads=args.n
+		self.scaling = args.s
+		self.hscaling = args.hs
+		self.wscaling = args.ws
 		self.verbose= args.V
 		self.ci, self.windowFlank, self.ofh = args.ci, args.w,args.o
 		if self.maxMapq==None:

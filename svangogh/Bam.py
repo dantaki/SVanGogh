@@ -1,5 +1,5 @@
 #!/usr/env python
-import pysam
+import pysam,sys
 from Alignment import Alignment
 from Cigar import Cigar
 from Read import Read
@@ -67,6 +67,7 @@ class Bam():
 	def pixelPrep(self,SV):
 		self.medianClip(SV)
 		self.assignClips()
+		if self.medStart==self.medEnd: sys.stderr.write('ERROR: median start clip:{} is equal to the median end clip:{}\n'.format(self.medStart,self.medEnd))
 	def medianClip(self,SV):
 		start = [x[0] for x in self.clips if x[0] != None]
 		end= [x[1] for x in self.clips if x[1] != None]
