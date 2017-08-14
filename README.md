@@ -3,21 +3,22 @@ Pixelate SVs!
 
 ## Install
 
-`pip install https://github.com/dantaki/SVanGogh/releases/tag/v0.1`
+1. `git clone --recursive https://github.com/dantaki/SVanGogh`
+2. `cd SVanGogh && pip install dist/SVanGogh-0.1.tar.gz` 
 
 #### Requires:
-
-* pysam
+* PIL
 * pybedtools
+* pysam
 * scipy
+* tqdm 
 
 ## Usage
 
 ```
 $ svangogh --help
-
 usage: svangogh [-h] -i I [-r R] [-b B] [-v V] [-t T] [-ci] [-w W] [-c C]
-                [-f F] [-n N] [-m M] [-V] [-o O]
+                [-f F] [-n N] [-m M] [-s S] [-hs HS] [-ws WS] [-V] [-o O]
 
 svangogh     --paint SV breakpoints--
 
@@ -40,6 +41,9 @@ SV painting arguments:
   -f F          Flanking bp to paint. [20]
   -n N          Maximum number of reads to paint. [10]
   -m M          Maximum MAPQ. [Maximum in sample of reads]
+  -s S          Scaling multiplier. Adjust the scaled image size. [5]
+  -hs HS        Height scaling multiplier. Adjust the height of the scaled image size. [5]
+  -ws WS        Width scaling multiplier. Adjust the width of the scaled image size [5]. 
 
 Optional arguments:
   -V            Verbose. Display a progress bar.
