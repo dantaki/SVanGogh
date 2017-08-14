@@ -4,6 +4,7 @@ from Alignment import Alignment
 from Cigar import Cigar
 from Read import Read
 import numpy as np
+from operator import itemgetter
 def unionize(reads,qname,qAln):
 	if reads.get(qname)!= None:
 		read = reads[qname]
@@ -16,55 +17,54 @@ def unionize(reads,qname,qAln):
 		reads[qname]=read
 	return reads
 class Bam():
-	def __init__(self,ifh):
-		self.ifh=ifh
-		self.bam = pysam.AlignmentFile(ifh,'rb')
+	def __init__(self,SV=None,Args=None):
+		self.ifh=Args.ifh
+		self.bam = pysam.AlignmentFile(self.ifh,'rb')
 		self.reads=None
 		self.clips=None
 		self.medStart=None
 		self.medEnd=None
-	def leftFlank(self,SV,Args):
+		self.verbose=Args.verbose
 		READS={}
 		CLIPS=[]
+		if self.verbose==True: print "processing left breakpoint"
 		for al in self.bam.fetch(str(SV.chrom),SV.leftCI[0]-Args.windowFlank,SV.leftCI[1]+Args.windowFlank):
 			if al.cigarstring==None or len(al.get_reference_positions())==0: continue
-			qAln = Alignment()
-			pStrand='+'
-			if al.is_reverse: pStrand='-'
-			qCig = Cigar(al.cigarstring)
-			##### LOAD qALN #####
-			qAln.refPos(qCig,al.reference_start,al.get_reference_positions())
+			qAln, qCig = Alignment(al), Cigar(al.cigarstring)
 			if SV.svtype=='INS': qAln.queryPos(qCig)
-			qAln.orient(pStrand)
-			qAln.quality(al.mapping_quality)
 			qAln.setClips(qCig,al.reference_start,al.reference_end,SV.leftCI,SV.rightCI,)
 			if SV.svtype=='DEL' or SV.svtype=='DUP':qAln.cigarSV(qCig.cig,al.reference_start,SV.start,SV.end,SV.svtype,SV.leftCI,SV.rightCI)
-			#####################
 			CLIPS.append((qAln.startClip,qAln.endClip))
 			READS=unionize(READS,al.query_name,qAln)
-		self.reads=READS
-		self.clips=CLIPS
-	def rightFlank(self,SV,Args):
-		READS=self.reads
-		CLIPS=self.clips
+		if self.verbose==True: print "left breakpoint complete"
+		if self.verbose==True: print "processing right breakpoint"
 		for al in self.bam.fetch(str(SV.chrom),SV.rightCI[0]-Args.windowFlank,SV.rightCI[1]+Args.windowFlank):
 			if al.cigarstring==None or len(al.get_reference_positions())==0: continue
-			qAln = Alignment()
-			pStrand='+'
-			if al.is_reverse: pStrand='-'
-			qCig = Cigar(al.cigarstring)
-			##### LOAD qALN #####
-			qAln.refPos(qCig,al.reference_start,al.get_reference_positions())
-			qAln.orient(pStrand)
-			qAln.quality(al.mapping_quality)
+			qAln, qCig = Alignment(al), Cigar(al.cigarstring)
 			qAln.setClips(qCig,al.reference_start,al.reference_end,SV.leftCI,SV.rightCI)
 			if SV.svtype=='DEL' or SV.svtype=='DUP':qAln.cigarSV(qCig.cig,al.reference_start,SV.start,SV.end,SV.svtype,SV.leftCI,SV.rightCI)
-			#####################
 			CLIPS.append((qAln.startClip,qAln.endClip))
 			READS=unionize(READS,al.query_name,qAln)
+		if self.verbose==True: print "right breakpoint complete"
 		self.clips=CLIPS
 		self.reads=READS
+		if SV.svtype=='INS': self.insertion()
+		self.pixelPrep(SV)
+	def insertion(self):
+		if self.verbose==True: print "processing insertions"
+		for name in self.reads:
+			qPos,qGaps=[],[]
+			if len(self.reads[name].alignments) < 1: continue
+			for Aln in self.reads[name].alignments: qPos.append((Aln.qStart,Aln.qEnd,Aln.strand))
+			alns = sorted(list(set(qPos)),key=itemgetter(0,1))
+			for i in range(len(alns)-1):
+				qGap = alns[i+1][0]-alns[i][1]
+				if alns[i][2]==alns[i+1][2]:
+					if qGap >= 20: qGaps.append(qGap)
+			if len(qGaps)>0: self.reads[name].insertion=max(qGaps)
+		if self.verbose==True: print "insertion processing complete"
 	def pixelPrep(self,SV):
+		if self.verbose==True: print "painting ..."
 		self.medianClip(SV)
 		self.assignClips()
 		if self.medStart==self.medEnd: sys.stderr.write('ERROR: median start clip:{} is equal to the median end clip:{}\n'.format(self.medStart,self.medEnd))

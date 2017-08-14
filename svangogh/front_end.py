@@ -25,23 +25,18 @@ class Arguments():
 		pixArgs.add_argument('-s', help='Scaling multiplier. Adjust the scaled image size. [5]',required=False,type=int,default=5)
 		pixArgs.add_argument('-hs', help='Height scaling multiplier. Adjust the height of the scaled image size. [5]',required=False,type=int,default=None)
 		pixArgs.add_argument('-ws', help='Width scaling multiplier. Adjust the width of the scaled image size [5]. ',required=False,type=int,default=None)
-		optArgs.add_argument('-V', help='Verbose. Display a progress bar.',required=False,default=False,action='store_true')
+		optArgs.add_argument('-V', help='Verbose.',required=False,default=False,action='store_true')
+		optArgs.add_argument('-P', help='Display a progress bar.',required=False,default=False,action='store_true')
 		optArgs.add_argument('-o','-out', help='output',required=False,default="breakPainter",type=str)
 		args = parser.parse_args()
 		self.ifh = args.i
 		region = args.r
 		bed=args.b
 		vcf=args.v
-		self.maxMapq=args.m
-		self.breakType=args.t
-		self.maxClip = args.c 
-		self.maxFlank = args.f
-		self.maxReads=args.n
-		self.scaling = args.s
-		self.hscaling = args.hs
-		self.wscaling = args.ws
-		self.verbose= args.V
-		self.ci, self.windowFlank, self.ofh = args.ci, args.w,args.o
+		self.breakType,self.ci, self.windowFlank, self.maxClip = args.t,args.ci,args.w,args.c
+		self.maxFlank,self.maxReads,self.maxMapq = args.f,args.n,args.m
+		self.scaling,self.hscaling,self.wscaling = args.s,args.hs,args.ws
+		self.verbose,self.progress,self.ofh = args.V,args.P,args.o
 		if self.maxMapq==None:
 			c, maxQ=0,0
 			for al in pysam.AlignmentFile(self.ifh).fetch(until_eof=True):
@@ -73,12 +68,9 @@ class Arguments():
 				for l in f:
 			       		if l.startswith('#'): continue
 					r = l.rstrip('\n').split('\t')
-					c=str(r[0])
-					s=int(r[1])
-					s-=1
-					e=0
-					svtype=None
+					c,s,e,svtype=str(r[0]),int(r[1]),0,None
 					leftCI, rightCI  = (-1*self.maxClip, self.maxClip), (-1*self.maxClip,self.maxClip)
+					s-=1
 					for i in r[7].split(';'):
 						if 'SVTYPE=' in i: svtype=i.replace('SVTYPE=','')
 						if i.startswith('END='): e=int(i.replace('END=',''))

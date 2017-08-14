@@ -9,21 +9,19 @@ def overlap(s1,e1,s2,e2):
 	o=sorted([float(ovr)/(e2-s2+1),float(ovr)/(e1-s1+1)])
 	return o[0]
 class Alignment():
-	def __init__(self):
-		self.pos=[None]
-		self.strand=None
-		self.mapq=None
+	def __init__(self,al=None):
+		strand='+'
+		if al.is_reverse: strand='-'
+		self.pos=al.get_reference_positions()
+		self.strand=strand
+		self.mapq=int(al.mapping_quality)
 		self.startClip=None
 		self.endClip=None
 		self.qStart=None
 		self.qEnd=None
-	def refPos(self,cig,left,posit):
-		self.pos=posit
 	def queryPos(self,cig): 
 		cig.qPos()
 		self.qStart,self.qEnd = cig.qStart,cig.qEnd
-	def orient(self,strand): self.strand=strand
-	def quality(self,mapq):  self.mapq=int(mapq)
 	def setClips(self,cig,leftPos,rightPos,leftCI,rightCI): 
 		if cig.leftClip==True and leftCI[0]<=leftPos<=leftCI[1]: self.startClip=leftPos
 		elif cig.leftClip==True and rightCI[0]<=leftPos<=rightCI[1]:self.endClip=leftPos

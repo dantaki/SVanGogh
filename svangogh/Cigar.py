@@ -22,11 +22,12 @@ class Cigar():
 		if rightFlg == 4 or rightFlg == 5: self.rightClip=True
 		self.qStart=None
 		self.qEnd=None
-	def aLen(self):
-		aLen=0
-		for (flg,leng) in  self.cig:
-			if flg == 0 or flg == 2 or flg==3 or flg==7 or flg==8: aLen=aLen+leng
-		return aLen
+	# Deprecated 
+	#def aLen(self):
+	#	aLen=0
+	#	for (flg,leng) in  self.cig:
+	#		if flg == 0 or flg == 2 or flg==3 or flg==7 or flg==8: aLen=aLen+leng
+	#	return aLen
 	def qPos(self):
 		qInd=0
 		qStart=0

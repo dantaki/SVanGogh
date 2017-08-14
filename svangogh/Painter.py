@@ -9,16 +9,6 @@ def pixelUnion(tmp,pix):
 		if tmp[i] == [0,0,0] and pix[i]!=[0,0,0]:unionPix.append(pix[i])
 		if tmp[i] != [0,0,0] and pix[i]!=[0,0,0]:unionPix.append([max(tmp[i][0],pix[i][0]),max(tmp[i][1],pix[i][1]),max(tmp[i][2],pix[i][2])])
 	return unionPix
-def pixelUnionInsertion(tmp,pix,clip1,clip2):
-	unionPix=[]
-	for i in xrange(len(tmp)):
-		if tmp[i] == [0,0,0] and pix[i]==[0,0,0]:unionPix.append([0,0,0])
-		if tmp[i] != [0,0,0] and pix[i]==[0,0,0]:unionPix.append(tmp[i])
-		if tmp[i] == [0,0,0] and pix[i]!=[0,0,0]:unionPix.append(pix[i])
-		if tmp[i] != [0,0,0] and pix[i]!=[0,0,0]:
-			if tmp[i][0]==clip1 and pix[i][0]==clip1: unionPix.append([clip2,max(tmp[i][1],pix[i][1]),max(tmp[i][2],pix[i][2])])
-			else: unionPix.append([max(tmp[i][0],pix[i][0]),max(tmp[i][1],pix[i][1]),max(tmp[i][2],pix[i][2])])
-	return unionPix
 def appendOrder(i,o,t):
 	for x in sorted(i, key=itemgetter(0)):
 		if x[1] in t: o.append(x[1])
@@ -30,7 +20,7 @@ class Painter():
 		self.twoClip=[]
 		self.oneClip=[]
 		self.mappedAln=[]
-		self.insertionReads=[]
+		self.insAln=[]
 		self.pix={}
 		self.readPix=[]
 		self.order=[]
@@ -46,17 +36,7 @@ class Painter():
 		if Args.wscaling != None: wscale=Args.wscaling
 		if Args.hscaling != None: hscale=Args.hscaling
 		self.iwidth, self.iheight =Args.maxFlank*wscale*4, Args.maxReads*hscale
-	def drawCanvas(self,flank,startClip,endClip): self.canvas=Canvas(flank,startClip,endClip).coord
-	# DEPRECATED
-	#def drawCanvasCI(self,leftCI,rightCI):
-	#	for x in range(leftCI[0]-self.flank,leftCI[1]+self.flank): self.canvas.append(x)
-	#	for x in range(rightCI[0]-self.flank,rightCI[1]+self.flank): self.canvas.append(x)
-	#	self.canvasLeftMin,self.canvasRightMin=leftCI[0]-self.flank, rightCI[1]-self.flank
-	def drawInsertionCanvas(self,leftClip,rightClip,iSize):
-		for x in range(leftClip-self.flank,leftClip+1): self.canvas.append(x)
-		for x in range((-1*iSize),0): self.canvas.append(x)
-		for x in range(rightClip,rightClip+self.flank+1): self.canvas.append(x)
-		self.canvasLeftMin, self.canvasRightMin =leftClip-self.flank, rightClip
+	def drawCanvas(self,flank,startClip,endClip,svtype): self.canvas=Canvas(flank,startClip,endClip,svtype).coord
 	def transformMapq(self,mapq):
 		mapq = self.mapqFunc*mapq
 		if mapq > 255: mapq=255
@@ -67,7 +47,8 @@ class Painter():
 		self.clip=255
 		for name in reads:
 			Read=reads[name]
-			Read.pixelPrep(Args.maxMapq)			
+			Read.pixelPrep(Args.maxMapq)
+			if Read.insertion!=None: self.insAln.append((Read.mapq,name))			
 			if Read.startClip!=None and Read.endClip!=None: self.twoClip.append((Read.mapq+Read.score,name))
 			elif (Read.startClip!=None and Read.endClip==None) or (Read.startClip==None and Read.endClip!=None): self.oneClip.append((Read.mapq+Read.score,name)) 
 			else: self.mappedAln.append((Read.mapq,name))
@@ -79,46 +60,21 @@ class Painter():
 				strandPix=self.strandMatch
 				if Read.strandPix != Aln.strand: strandPix=self.strandDif
 				for x in self.canvas:
-					if x==Aln.startClip or x==Aln.endClip: tmp.append([self.clip,mapq,strandPix])
-					elif x!=Aln.startClip and x!=Aln.endClip and x in Aln.pos: tmp.append([self.mapped,mapq,strandPix])
-					elif x not in Aln.pos: tmp.append([self.unmapped,self.unmapped,self.unmapped])
+					if x<0:
+						if Read.insertion==None: tmp.append([self.unmapped,self.unmapped,self.unmapped])
+						elif Read.insertion!=None:
+							if -1*x<=Read.insertion: tmp.append([self.clip,self.unmapped,self.unmapped])
+							else: tmp.append([self.unmapped,self.unmapped,self.unmapped])
+					else:
+						if x==Aln.startClip or x==Aln.endClip: tmp.append([self.clip,mapq,strandPix])
+						elif x!=Aln.startClip and x!=Aln.endClip and x in Aln.pos: tmp.append([self.mapped,mapq,strandPix])
+						elif x not in Aln.pos: tmp.append([self.unmapped,self.unmapped,self.unmapped])
 				if self.pix.get(name)==None: self.pix[name]=tmp
 				else: self.pix[name]=pixelUnion(tmp,self.pix[name])
-	def insertionPainter(self,reads,Ins):
-		self.mapped=63.75
-		self.clip1=127.5
-		self.clip2=191.25
-		self.ins=255
-		for name in reads:
-			Read=reads[name]
-			Read.readPosition()
-			if Read.left >= self.canvasLeftMin and Read.right >= self.canvasRightMin: self.bridgingReads.append(name)
-			masterStrand=Read.alignments[0].strand
-			for Aln in Read.alignments:
-				tmp=[]
-				mapq=self.transformMapq(Aln.mapq)
-				strandPix=self.forward
-				if Aln.strand=='-':strandPix=self.reverse
-				for x in self.canvas:
-					if x<0 and Read.insertion==None: tmp.append([self.unmapped,self.unmapped,self.unmapped])
-					elif x<0 and Read.insertion!=None:
-						if x<Read.insertion+(-1*Ins.size):
-							tmp.append([self.ins,self.unmapped,self.unmapped])
-							self.insertionReads.append(name)
-						else: tmp.append([self.unmapped,self.unmapped,self.unmapped]) 
-					if x==Aln.endClip or x==Aln.startClip:
-						tmp.append([self.clip1,mapq,strandPix])
-						self.clippedReads.append(name)
-					elif x!=Aln.startClip and x!=Aln.endClip and x in Aln.pos: tmp.append([self.mapped,mapq,strandPix])
-					elif x not in Aln.pos and x >=0: tmp.append([self.unmapped,self.unmapped,self.unmapped])
-				if masterStrand=='+':
-					if self.samePix.get(name)==None: self.samePix[name]=tmp
-					else: self.samePix[name]=pixelUnionInsertion(tmp,self.samePix[name],self.clip1,self.clip2)
-				else:
-					if self.diffPix.get(name)==None: self.diffPix[name]=tmp
-					else: self.diffPix[name]=pixelUnionInsertion(tmp,self.diffPix[name],self.clip1,self.clip2)
-	def orderPixelsDelDup(self,MAX):
-		"""print the reads in order, for deletions and duplications"""
+	def orderPixels(self,MAX):
+		if len(self.insAln)>0: 
+			appendOrder(self.twoClip,self.order,list(set(self.insAln)&set(self.samePix)))
+			appendOrder(self.oneClip,self.order,list(set(self.insAln)&set(self.samePix)))
 		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.samePix)
 		if len(self.oneClip)>0: appendOrder(self.oneClip,self.order,self.samePix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.samePix)
@@ -136,39 +92,6 @@ class Painter():
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.diffPix)
 		for x in self.order[0:MAX-1]: self.readPix.append(self.pix[x])
 		for x in range(MAX-len(self.readPix)): self.readPix.append(self.zeroPix())
-	def orderPixelsInsertion(self):
-		for x in self.samePix:
-			if x in self.insertionReads and x in self.clippedReads and x in self.bridgingReads: self.readPix.append(self.samePix[x])
-		for x in self.samePix:
-			if x in self.insertionReads and x in self.clippedReads and x not in self.bridgingReads: self.readPix.append(self.samePix[x])
-		for x in self.samePix:
-			if x in self.insertionReads and x not in self.clippedReads and x in self.bridgingReads: self.readPix.append(self.samePix[x])
-		for x in self.samePix:
-			if x in self.insertionReads and x not in self.clippedReads and x not in self.bridgingReads: self.readPix.append(self.samePix[x])
-		for x in self.samePix:
-			if x not in self.insertionReads and x in self.clippedReads and x in self.bridgingReads: self.readPix.append(self.samePix[x])
-		for x in self.samePix:
-			if x not in self.insertionReads and x in self.clippedReads and x not in self.bridgingReads: self.readPix.append(self.samePix[x])
-		for x in self.samePix:
-			if x not in self.insertionReads and x not in self.clippedReads and x in self.bridgingReads: self.readPix.append(self.samePix[x])
-		for x in self.samePix:
-			if x not in self.insertionReads and x not in self.clippedReads and x not in self.bridgingReads: self.readPix.append(self.samePix[x])
-		for x in self.diffPix:
-			if x in self.insertionReads and x in self.clippedReads and x in self.bridgingReads: self.readPix.append(self.diffPix[x])
-		for x in self.diffPix:
-			if x in self.insertionReads and x in self.clippedReads and x not in self.bridgingReads: self.readPix.append(self.diffPix[x])
-		for x in self.diffPix:
-			if x in self.insertionReads and x not in self.clippedReads and x in self.bridgingReads: self.readPix.append(self.diffPix[x])
-		for x in self.diffPix:
-			if x in self.insertionReads and x not in self.clippedReads and x not in self.bridgingReads: self.readPix.append(self.diffPix[x])
-		for x in self.diffPix:
-			if x not in self.insertionReads and x in self.clippedReads and x in self.bridgingReads: self.readPix.append(self.diffPix[x])
-		for x in self.diffPix:
-			if x not in self.insertionReads and x in self.clippedReads and x not in self.bridgingReads: self.readPix.append(self.diffPix[x])
-		for x in self.diffPix:
-			if x not in self.insertionReads and x not in self.clippedReads and x in self.bridgingReads: self.readPix.append(self.diffPix[x])
-		for x in self.diffPix:
-			if x not in self.insertionReads and x not in self.clippedReads and x not in self.bridgingReads: self.readPix.append(self.diffPix[x])
 	def printPixels(self,SV,o):
 		unscaled='{}_{}_{}_{}_{}_unscaled.png'.format(o,SV.chrom,SV.start,SV.end,SV.svtype)
 		scaled='{}_{}_{}_{}_{}_scaled.png'.format(o,SV.chrom,SV.start,SV.end,SV.svtype)
