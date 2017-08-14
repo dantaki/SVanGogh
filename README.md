@@ -7,7 +7,7 @@ Pixelate SVs!
 2. `cd SVanGogh && pip install dist/SVanGogh-0.1.tar.gz` 
 
 #### Requires:
-* PIL
+* Pillow (PIL)
 * pybedtools
 * pysam
 * scipy

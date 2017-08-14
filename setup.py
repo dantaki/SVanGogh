@@ -13,8 +13,10 @@ setup(
     license='LICENSE',
     long_description=open('README').read(),
     install_requires=[
-        "pysam",
+        "Pillow",
+	"pysam",
         "pybedtools",
-	"scipy"
+	"scipy",
+    	"tqdm"
     ],
 )
