@@ -48,21 +48,21 @@ class Arguments():
 		if region == None and bed ==None and vcf==None:
 			sys.stderr.write('FATAL ERROR: Please supply either a region <-r chr:start-end> or a BED file <-b> or a VCF file <-v>\n')
 			sys.exit(1)
-		if region != None and bed==None and self.breakType==None and vcf==None:
+		if region != None and self.breakType==None:
 			sys.stderr.write('FATAL ERROR: Please define the SV type <-t <DEL|DUP|INV|INS>\n')
 			sys.exit(1)
 		regions=[]
+		if region!=None:
+			c,p = region.split(':')
+			s,e = p.split('-')
+			sv = SV(c,s,e,self.breakType,(-1*self.maxClip,self.maxClip),(-1*self.maxClip,self.maxClip))
+			if sv.qc==1: regions.append(sv)
 		if bed !=None:
 			with open(bed,'r') as f:
 				for l in f:
 					a = l.rstrip('\n').split('\t')
 					sv = SV(a[0],a[1],a[2],a[3],(-1*self.maxClip,self.maxClip),(-1*self.maxClip,self.maxClip))
-					if sv.qc==1: regions.append(sv)	
-		if region!=None:
-			c,p = region.split(':')
-			s,e = p.split('-')
-			sv = SV(c,s,e,self.breakType,(-1*self.maxClip,self.maxClip),(-1*self.maxClip,self.maxClip))
-			if sv.qc==1: regions.append(sv)		
+					if sv.qc==1: regions.append(sv)			
 		if vcf != None:
 			with open(vcf,'r') as f:
 				for l in f:

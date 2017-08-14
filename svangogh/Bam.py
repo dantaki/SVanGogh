@@ -41,6 +41,7 @@ class Bam():
 		for al in self.bam.fetch(str(SV.chrom),SV.rightCI[0]-Args.windowFlank,SV.rightCI[1]+Args.windowFlank):
 			if al.cigarstring==None or len(al.get_reference_positions())==0: continue
 			qAln, qCig = Alignment(al), Cigar(al.cigarstring)
+			if SV.svtype=='INS': qAln.queryPos(qCig)
 			qAln.setClips(qCig,al.reference_start,al.reference_end,SV.leftCI,SV.rightCI)
 			if SV.svtype=='DEL' or SV.svtype=='DUP':qAln.cigarSV(qCig.cig,al.reference_start,SV.start,SV.end,SV.svtype,SV.leftCI,SV.rightCI)
 			CLIPS.append((qAln.startClip,qAln.endClip))
