@@ -19,6 +19,7 @@ class Alignment():
 		self.endClip=None
 		self.qStart=None
 		self.qEnd=None
+		self.insertion=None
 	def queryPos(self,cig): 
 		cig.qPos()
 		self.qStart,self.qEnd = cig.qStart,cig.qEnd
@@ -27,10 +28,10 @@ class Alignment():
 		elif cig.leftClip==True and rightCI[0]<=leftPos<=rightCI[1]:self.endClip=leftPos
 		if cig.rightClip==True and leftCI[0]<=rightPos<=leftCI[1]: self.startClip=rightPos
 		elif cig.rightClip==True and rightCI[0]<=rightPos<=rightCI[1]: self.endClip=rightPos
-	def cigarSV(self,cig,left,breakStart,breakEnd,svtype,leftCI,rightCI):
+	def cigarSV(self,cig,left,breakStart,breakEnd,svtype,leftCI,rightCI,minLen):
 		ind=0
 		for (flg,leng) in cig:
-			if (flg==1 or flg==2) and leng > 19:
+			if (flg==1 or flg==2) and leng > (minLen-1):
 				s1 = left+ind
 				e1 = left+ind+leng-1
 				if svtype=='DUP': 
@@ -41,4 +42,7 @@ class Alignment():
 					if ovr1 < ovr2: s1,e1=s2,e2
 				if leftCI[0]<=s1<=leftCI[1]: self.startClip=s1
 				if rightCI[0]<=e1<=rightCI[1]: self.endClip=e1
+				if svtype=='INS':
+					if leftCI[0]<=s1<=leftCI[1]: self.startClip, self.insertion=s1,leng
+					if rightCI[0]<=e1<=rightCI[1]: self.endClip,self.insertion=e1,leng
 			if flg==0 or flg==2 or flg==3 or flg==7 or flg==8: ind+=leng	

@@ -11,7 +11,7 @@ def pixelUnion(tmp,pix):
 	return unionPix
 def appendOrder(i,o,t):
 	for x in sorted(i, key=itemgetter(0)):
-		if x[1] in t: o.append(x[1])
+		if x[1] in list(set(t)-set(o)): o.append(x[1])
 class Painter():
 	def __init__(self,Args=None):
 		self.canvas=[]
@@ -48,7 +48,7 @@ class Painter():
 		for name in reads:
 			Read=reads[name]
 			Read.pixelPrep(Args.maxMapq)
-			if Read.insertion!=None: self.insAln.append((Read.mapq,name))			
+			if Read.insertion!=None: self.insAln.append(name)			
 			if Read.startClip!=None and Read.endClip!=None: self.twoClip.append((Read.mapq+Read.score,name))
 			elif (Read.startClip!=None and Read.endClip==None) or (Read.startClip==None and Read.endClip!=None): self.oneClip.append((Read.mapq+Read.score,name)) 
 			else: self.mappedAln.append((Read.mapq,name))
@@ -75,6 +75,7 @@ class Painter():
 		if len(self.insAln)>0: 
 			appendOrder(self.twoClip,self.order,list(set(self.insAln)&set(self.samePix)))
 			appendOrder(self.oneClip,self.order,list(set(self.insAln)&set(self.samePix)))
+			appendOrder(self.mappedAln,self.order,list(set(self.insAln)&set(self.samePix)))
 		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.samePix)
 		if len(self.oneClip)>0: appendOrder(self.oneClip,self.order,self.samePix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.samePix)

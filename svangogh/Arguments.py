@@ -19,6 +19,7 @@ class Arguments():
 		svArgs.add_argument('-ci',help='Search for clips within confidence intervals. Requires VCF. Overrides <-c>',required=False,default=False,action='store_true')
 		svArgs.add_argument('-w', help='Flanking bp to search for supporting reads. [100]',required=False,type=int,default=100)
 		svArgs.add_argument('-c', help='Maximum clipped distance to breakpoint. [50]',required=False,type=int,default=50)
+		svArgs.add_argument('-x', help='Minimum INDEL size. [7]',required=False,type=int,default=7)
 		pixArgs.add_argument('-f', help='Flanking bp to paint. [20]',required=False,type=int,default=20)
 		pixArgs.add_argument('-n', help='Maximum number of reads to paint. [10]',required=False,type=int,default=10)
 		pixArgs.add_argument('-m', help='Maximum MAPQ. [Maximum in sample of reads]',required=False,type=int,default=None)
@@ -33,7 +34,7 @@ class Arguments():
 		region = args.r
 		bed=args.b
 		vcf=args.v
-		self.breakType,self.ci, self.windowFlank, self.maxClip = args.t,args.ci,args.w,args.c
+		self.breakType,self.ci, self.windowFlank, self.maxClip, self.minLen = args.t,args.ci,args.w,args.c,args.x
 		self.maxFlank,self.maxReads,self.maxMapq = args.f,args.n,args.m
 		self.scaling,self.hscaling,self.wscaling = args.s,args.hs,args.ws
 		self.verbose,self.progress,self.ofh = args.V,args.P,args.o

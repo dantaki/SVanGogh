@@ -34,7 +34,7 @@ class Bam():
 			qAln, qCig = Alignment(al), Cigar(al.cigarstring)
 			if SV.svtype=='INS': qAln.queryPos(qCig)
 			qAln.setClips(qCig,al.reference_start,al.reference_end,SV.leftCI,SV.rightCI,)
-			if SV.svtype=='DEL' or SV.svtype=='DUP':qAln.cigarSV(qCig.cig,al.reference_start,SV.start,SV.end,SV.svtype,SV.leftCI,SV.rightCI)
+			if SV.svtype!='INV':qAln.cigarSV(qCig.cig,al.reference_start,SV.start,SV.end,SV.svtype,SV.leftCI,SV.rightCI,Args.minLen)
 			CLIPS.append((qAln.startClip,qAln.endClip))
 			READS=unionize(READS,al.query_name,qAln)
 		if self.verbose==True: print "left breakpoint complete"
@@ -44,26 +44,29 @@ class Bam():
 			qAln, qCig = Alignment(al), Cigar(al.cigarstring)
 			if SV.svtype=='INS': qAln.queryPos(qCig)
 			qAln.setClips(qCig,al.reference_start,al.reference_end,SV.leftCI,SV.rightCI)
-			if SV.svtype=='DEL' or SV.svtype=='DUP':qAln.cigarSV(qCig.cig,al.reference_start,SV.start,SV.end,SV.svtype,SV.leftCI,SV.rightCI)
+			if SV.svtype!='INV':qAln.cigarSV(qCig.cig,al.reference_start,SV.start,SV.end,SV.svtype,SV.leftCI,SV.rightCI,Args.minLen)
 			CLIPS.append((qAln.startClip,qAln.endClip))
 			READS=unionize(READS,al.query_name,qAln)
 		if self.verbose==True: print "right breakpoint complete"
 		self.clips=CLIPS
 		self.reads=READS
-		if SV.svtype=='INS': self.insertion()
+		if SV.svtype=='INS': self.insertion(Args)
 		self.pixelPrep(SV)
-	def insertion(self):
+	def insertion(self,Args=None):
 		if self.verbose==True: print "processing insertions"
 		for name in self.reads:
 			qPos,qGaps=[],[]
 			if len(self.reads[name].alignments) < 1: continue
-			for Aln in self.reads[name].alignments: qPos.append((Aln.qStart,Aln.qEnd,Aln.strand))
+			for Aln in self.reads[name].alignments: qPos.append((Aln.qStart,Aln.qEnd,Aln.strand,Aln.insertion))
 			alns = sorted(list(set(qPos)),key=itemgetter(0,1))
 			for i in range(len(alns)-1):
 				qGap = alns[i+1][0]-alns[i][1]
 				if alns[i][2]==alns[i+1][2]:
-					if qGap >= 20: qGaps.append(qGap)
-			if len(qGaps)>0: self.hasIns,self.reads[name].insertion=True,max(qGaps)
+					if qGap >= Args.minLen: qGaps.append(qGap)
+				if alns[i][3] != None: qGaps.append(alns[i][3])
+				if alns[i+1][3] != None: qGaps.append(alns[i+1][3])
+			if len(qGaps)>0: 
+				self.hasIns,self.reads[name].insertion=True,max(qGaps)
 		if self.verbose==True: print "insertion processing complete"
 	def pixelPrep(self,SV):
 		if self.verbose==True: print "painting ..."
