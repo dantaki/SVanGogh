@@ -19,7 +19,8 @@ Pixelate SVs!
 $ svangogh --help
 
 usage: svangogh [-h] -i I [-r R] [-b B] [-v V] [-t T] [-ci] [-w W] [-c C]
-                [-f F] [-n N] [-m M] [-s S] [-hs HS] [-ws WS] [-V] [-P] [-o O]
+                [-x X] [-f F] [-n N] [-m M] [-s S] [-hs HS] [-ws WS] [-V] [-P]
+                [-o O]
 
 svangogh     --paint SV breakpoints--
 
@@ -37,6 +38,7 @@ SV arguments:
   -ci           Search for clips within confidence intervals. Requires VCF. Overrides <-c>
   -w W          Flanking bp to search for supporting reads. [100]
   -c C          Maximum clipped distance to breakpoint. [50]
+  -x X          Minimum INDEL size. [7]
 
 SV painting arguments:
   -f F          Flanking bp to paint. [20]
