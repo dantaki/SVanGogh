@@ -13,7 +13,7 @@ def iterator(Args,SV):
 	bam = Bam(SV,Args)
 	READS, Bosch=bam.reads,Painter(Args)
 	Bosch.drawCanvas(Args.maxFlank,bam.medStart,bam.medEnd,bam.hasIns)
-	Bosch.svPainter(READS,Args)
+	Bosch.svPainter(READS)
 	if SV.svtype!='INV': Bosch.orderPixels(Args.maxReads)
 	elif SV.svtype=='INV': Bosch.orderPixelsInversion(Args.maxReads)
 	if len(Bosch.readPix)>0: Bosch.printPixels(SV,Args.ofh)

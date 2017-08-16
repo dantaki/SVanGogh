@@ -42,12 +42,11 @@ class Painter():
 		if mapq > 255: mapq=255
 		return mapq
 	def zeroPix(self): return [[0,0,0] for x in self.canvas]
-	def svPainter(self,reads,Args):
+	def svPainter(self,reads=None):
 		self.mapped=127.5
 		self.clip=255
 		for name in reads:
 			Read=reads[name]
-			Read.pixelPrep(Args.maxMapq)
 			if Read.insertion!=None: self.insAln.append(name)			
 			if Read.startClip!=None and Read.endClip!=None: self.twoClip.append((Read.mapq+Read.score,name))
 			elif (Read.startClip!=None and Read.endClip==None) or (Read.startClip==None and Read.endClip!=None): self.oneClip.append((Read.mapq+Read.score,name)) 
@@ -82,7 +81,7 @@ class Painter():
 		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.diffPix)
 		if len(self.oneClip)>0: appendOrder(self.oneClip,self.order,self.diffPix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.diffPix)
-		for x in self.order[0:MAX-1]: self.readPix.append(self.pix[x])
+		for x in self.order[0:MAX]: self.readPix.append(self.pix[x])
 		for x in range(MAX-len(self.readPix)): self.readPix.append(self.zeroPix())
 	def orderPixelsInversion(self,MAX,):
 		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.diffPix)
@@ -91,7 +90,7 @@ class Painter():
 		if len(self.oneClip)>0: appendOrder(self.oneClip,self.order,self.samePix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.samePix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.diffPix)
-		for x in self.order[0:MAX-1]: self.readPix.append(self.pix[x])
+		for x in self.order[0:MAX]: self.readPix.append(self.pix[x])
 		for x in range(MAX-len(self.readPix)): self.readPix.append(self.zeroPix())
 	def printPixels(self,SV,o):
 		unscaled='{}_{}_{}_{}_{}_unscaled.png'.format(o,SV.chrom,SV.start,SV.end,SV.svtype)

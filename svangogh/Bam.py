@@ -8,11 +8,13 @@ from operator import itemgetter
 def unionize(reads,qname,qAln):
 	if reads.get(qname)!= None:
 		read = reads[qname]
+		read.strandIncrement(qAln.strand)
 		read.loadAlignments(qAln)
 		reads[qname]=read
 	else:
 		read=Read()
 		read.label(qname)
+		read.strandIncrement(qAln.strand)
 		read.loadAlignments(qAln)
 		reads[qname]=read
 	return reads
@@ -51,7 +53,7 @@ class Bam():
 		self.clips=CLIPS
 		self.reads=READS
 		if SV.svtype=='INS': self.insertion(Args)
-		self.pixelPrep(SV)
+		self.pixelPrep(SV,Args)
 	def insertion(self,Args=None):
 		if self.verbose==True: print "processing insertions"
 		for name in self.reads:
@@ -68,11 +70,12 @@ class Bam():
 			if len(qGaps)>0: 
 				self.hasIns,self.reads[name].insertion=True,max(qGaps)
 		if self.verbose==True: print "insertion processing complete"
-	def pixelPrep(self,SV):
+	def pixelPrep(self,SV=None,Args=None):
 		if self.verbose==True: print "painting ..."
 		self.medianClip(SV)
 		self.assignClips()
 		if self.medStart==self.medEnd: self.medEnd=self.medStart+1
+		for name in self.reads: self.reads[name].pixelPrep(Args.maxMapq,self.medStart,self.medEnd)
 	def medianClip(self,SV):
 		start = [x[0] for x in self.clips if x[0] != None]
 		end= [x[1] for x in self.clips if x[1] != None]
