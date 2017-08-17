@@ -23,6 +23,7 @@ class Arguments():
 		pixArgs.add_argument('-f', help='Flanking bp to paint. [20]',required=False,type=int,default=20)
 		pixArgs.add_argument('-n', help='Maximum number of reads to paint. [10]',required=False,type=int,default=10)
 		pixArgs.add_argument('-m', help='Maximum MAPQ. [Maximum in sample of reads]',required=False,type=int,default=None)
+		pixArgs.add_argument('-X', help='Minimum number of supporting reads. [0]',required=False,type=int,default=0)
 		pixArgs.add_argument('-s', help='Scaling multiplier. Adjust the scaled image size. [5]',required=False,type=int,default=5)
 		pixArgs.add_argument('-hs', help='Height scaling multiplier. Adjust the height of the scaled image size. [5]',required=False,type=int,default=None)
 		pixArgs.add_argument('-ws', help='Width scaling multiplier. Adjust the width of the scaled image size [5]. ',required=False,type=int,default=None)
@@ -35,7 +36,7 @@ class Arguments():
 		bed=args.b
 		vcf=args.v
 		self.breakType,self.ci, self.windowFlank, self.maxClip, self.minLen = args.t,args.ci,args.w,args.c,args.x
-		self.maxFlank,self.maxReads,self.maxMapq = args.f,args.n,args.m
+		self.maxFlank,self.maxReads,self.maxMapq,self.minSR = args.f,args.n,args.m,args.X
 		self.scaling,self.hscaling,self.wscaling = args.s,args.hs,args.ws
 		self.verbose,self.progress,self.ofh = args.V,args.P,args.o
 		if self.maxMapq==None:

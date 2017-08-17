@@ -16,5 +16,5 @@ def iterator(Args,SV):
 	Bosch.svPainter(READS)
 	if SV.svtype!='INV': Bosch.orderPixels(Args.maxReads)
 	elif SV.svtype=='INV': Bosch.orderPixelsInversion(Args.maxReads)
-	if len(Bosch.readPix)>0: Bosch.printPixels(SV,Args.ofh)
+	if len(Bosch.readPix)>0: Bosch.printPixels(SV,Args)
 	if Args.verbose==True: print "=^..^= finished =^..^="

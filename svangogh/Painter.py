@@ -92,18 +92,26 @@ class Painter():
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.diffPix)
 		for x in self.order[0:MAX]: self.readPix.append(self.pix[x])
 		for x in range(MAX-len(self.readPix)): self.readPix.append(self.zeroPix())
-	def printPixels(self,SV,o):
-		unscaled='{}_{}_{}_{}_{}_unscaled.png'.format(o,SV.chrom,SV.start,SV.end,SV.svtype)
-		scaled='{}_{}_{}_{}_{}_scaled.png'.format(o,SV.chrom,SV.start,SV.end,SV.svtype)
-		dat='{}_{}_{}_{}_{}_pixels.txt'.format(o,SV.chrom,SV.start,SV.end,SV.svtype)
-		img_unscaled=smp.toimage(self.readPix)
-		img_scaled=smp.toimage(smp.imresize(self.readPix,(self.iheight,self.iwidth)))
-		img_unscaled.save(unscaled)
-		img_scaled.save(scaled)
-		ofh = open(dat,'w')
-		for x in self.readPix:
-			tmp=[]
-			for y in x: tmp.append(','.join(map(str,y)))
-			ofh.write('\t'.join(tmp)+'\n')
-		ofh.close()
-
+	def printSupportingReads(self,svtype=None,minSR=None):
+		printbool=False
+		if minSR>0:
+			if svtype=='INS' and len(self.insAln)>0: printbool=True
+			elif (svtype=='DEL' or svtype=='DUP') and (len(self.twoClip)>0 or len(self.oneClip)>0): printbool=True
+			elif svtype=='INV' and (len(list(set([x[1] for x in self.twoClip])&set(self.diffPix)))>0 or len(list(set([x[1] for x in self.oneClip])&set(self.diffPix)))>0): printbool=True
+		else: printbool=True
+		return printbool
+	def printPixels(self,SV=None,Args=None):
+		if self.printSupportingReads(SV.svtype,Args.minSR) == True:
+			unscaled='{}_{}_{}_{}_{}_unscaled.png'.format(Args.ofh,SV.chrom,SV.start,SV.end,SV.svtype)
+			scaled='{}_{}_{}_{}_{}_scaled.png'.format(Args.ofh,SV.chrom,SV.start,SV.end,SV.svtype)
+			dat='{}_{}_{}_{}_{}_pixels.txt'.format(Args.ofh,SV.chrom,SV.start,SV.end,SV.svtype)
+			img_unscaled=smp.toimage(self.readPix)
+			img_scaled=smp.toimage(smp.imresize(self.readPix,(self.iheight,self.iwidth)))
+			img_unscaled.save(unscaled)
+			img_scaled.save(scaled)
+			ofh = open(dat,'w')
+			for x in self.readPix:
+				tmp=[]
+				for y in x: tmp.append(','.join(map(str,y)))
+				ofh.write('\t'.join(tmp)+'\n')
+			ofh.close()
