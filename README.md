@@ -19,8 +19,8 @@ Pixelate SVs!
 $ svangogh --help
 
 usage: svangogh [-h] -i I [-r R] [-b B] [-v V] [-t T] [-ci] [-w W] [-c C]
-                [-x X] [-f F] [-n N] [-m M] [-s S] [-hs HS] [-ws WS] [-V] [-P]
-                [-o O]
+                [-x X] [-f F] [-n N] [-m M] [-X X] [-s S] [-hs HS] [-ws WS]
+                [-V] [-P] [-o O]
 
 svangogh     --paint SV breakpoints--
 
@@ -44,9 +44,10 @@ SV painting arguments:
   -f F          Flanking bp to paint. [20]
   -n N          Maximum number of reads to paint. [10]
   -m M          Maximum MAPQ. [Maximum in sample of reads]
+  -X X          Minimum number of supporting reads. [0]
   -s S          Scaling multiplier. Adjust the scaled image size. [5]
   -hs HS        Height scaling multiplier. Adjust the height of the scaled image size. [5]
-  -ws WS        Width scaling multiplier. Adjust the width of the scaled image size [5]. 
+  -ws WS        Width scaling multiplier. Adjust the width of the scaled image size [5].
 
 Optional arguments:
   -V            Verbose.
