@@ -21,6 +21,7 @@ class Painter():
 		self.oneClip=[]
 		self.mappedAln=[]
 		self.insAln=[]
+		self.invAln=[]
 		self.pix={}
 		self.readPix=[]
 		self.order=[]
@@ -47,6 +48,7 @@ class Painter():
 		self.clip=255
 		for name in reads:
 			Read=reads[name]
+			if Read.inversion!=None: self.invAln.append((Read.inversion,name))
 			if Read.insertion!=None: self.insAln.append(name)			
 			if Read.startClip!=None and Read.endClip!=None: self.twoClip.append((Read.mapq+Read.score,name))
 			elif (Read.startClip!=None and Read.endClip==None) or (Read.startClip==None and Read.endClip!=None): self.oneClip.append((Read.mapq+Read.score,name)) 
@@ -84,10 +86,13 @@ class Painter():
 		for x in self.order[0:MAX]: self.readPix.append(self.pix[x])
 		for x in range(MAX-len(self.readPix)): self.readPix.append(self.zeroPix())
 	def orderPixelsInversion(self,MAX,):
+		if len(self.invAln)>0: 
+			appendOrder(self.invAln,self.order,[x[1] for x in self.twoClip])
+			appendOrder(self.invAln,self.order,[x[1] for x in self.oneClip])
 		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.diffPix)
 		if len(self.oneClip)>0: appendOrder(self.oneClip,self.order,self.diffPix)
-		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.samePix)
 		if len(self.oneClip)>0: appendOrder(self.oneClip,self.order,self.samePix)
+		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.samePix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.samePix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.diffPix)
 		for x in self.order[0:MAX]: self.readPix.append(self.pix[x])
@@ -95,9 +100,9 @@ class Painter():
 	def printSupportingReads(self,svtype=None,minSR=None):
 		printbool=False
 		if minSR>0:
-			if svtype=='INS' and len(self.insAln)>0: printbool=True
-			elif (svtype=='DEL' or svtype=='DUP') and (len(self.twoClip)>0 or len(self.oneClip)>0): printbool=True
-			elif svtype=='INV' and (len(list(set([x[1] for x in self.twoClip])&set(self.diffPix)))>0 or len(list(set([x[1] for x in self.oneClip])&set(self.diffPix)))>0): printbool=True
+			if svtype=='INS' and len(self.insAln)>=minSR: printbool=True
+			elif (svtype=='DEL' or svtype=='DUP') and len(self.twoClip)>=minSR: printbool=True
+			elif svtype=='INV' and len(list(set([x[1] for x in self.twoClip+self.oneClip])&set([x[1] for x in self.invAln])))>=minSR: printbool=True
 		else: printbool=True
 		return printbool
 	def printPixels(self,SV=None,Args=None):

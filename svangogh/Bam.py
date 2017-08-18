@@ -75,7 +75,7 @@ class Bam():
 		self.medianClip(SV)
 		self.assignClips()
 		if self.medStart==self.medEnd: self.medEnd=self.medStart+1
-		for name in self.reads: self.reads[name].pixelPrep(Args.maxMapq,self.medStart,self.medEnd)
+		for name in self.reads: self.reads[name].pixelPrep(Args.maxMapq,self.medStart,self.medEnd,Args.minInv)
 	def medianClip(self,SV):
 		start = [x[0] for x in self.clips if x[0] != None]
 		end= [x[1] for x in self.clips if x[1] != None]

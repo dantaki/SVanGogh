@@ -12,7 +12,7 @@ pixelate SVs         Author:Danny Antaki dantaki@ucsd.edu
 ---------------------------------------------------------
 
 Usage: svangogh (-i BAM) [-r REGION] [-t SVTYPE] [-v VCF] [-b BED] 
-                         [--ci] [-w WINDOW] [-c CLIP] [--min-indel INDEL] 
+                         [--ci] [-w WINDOW] [-c CLIP] [--min-inv MININV] [--min-indel INDEL] 
                          [-f FLANK] [--max-reads MAXREADS] [--max-mapq MAXMAPQ] [--min-sr MINSR] 
                          [-s SCALE] [--hs HSCALE] [--ws WSCALE] 
                          [-V --verbose] [-P] [-o OUT] [-h --help]
@@ -33,6 +33,7 @@ SV Options:
   --ci                    search for clips within confidence intervals, requires -v, overrides -c
   -w WINDOW               flanking bp to search for supporting reads [default: 100]
   -c CLIP                 maximum distance of clipped position to breakpoint [default: 50]
+  --min-inv MININV        minimum overlap of the alignment to inversion, flags supporting reads [default: 0.5]
   --min-indel INDEL       minimum indel size [default: 7]
 
 Pixelating Options:  
@@ -67,12 +68,12 @@ class Arguments():
 	def __init__(self):
 	    arg=docopt(__doc__,version='0.1')
 	    for x in ['-w','-c','--min-indel','-f','--max-reads','--min-sr']: tryInt(arg[x],x)
-	    for x in ['-s','--hs','--ws']: tryFloat(arg[x],x)
+	    for x in ['--min-inv','-s','--hs','--ws']: tryFloat(arg[x],x)
 	    self.ifh = arg['-i']
 	    region = arg['-r']
 	    bed = arg['-b']
 	    vcf = arg['-v']
-	    self.breakType,self.ci,self.windowFlank,self.maxClip,self.minLen = arg['-t'],arg['--ci'],int(arg['-w']),int(arg['-c']),int(arg['--min-indel'])
+	    self.breakType,self.ci,self.windowFlank,self.maxClip,self.minInv,self.minLen = arg['-t'],arg['--ci'],int(arg['-w']),int(arg['-c']),float(arg['--min-inv']),int(arg['--min-indel'])
 	    self.maxFlank,self.maxReads,self.maxMapq,self.minSR = int(arg['-f']),int(arg['--max-reads']),arg['--max-mapq'],int(arg['--min-sr'])
 	    self.scaling,self.hscaling,self.wscaling = float(arg['-s']),float(arg['--hs']),float(arg['--ws'])
 	    self.verbose,self.progress,self.ofh = arg['--verbose'],arg['-P'],arg['-o']
