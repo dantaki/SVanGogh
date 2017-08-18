@@ -20,10 +20,10 @@ Usage: svangogh (-i BAM) [-r REGION] [-t SVTYPE] [-v VCF] [-b BED]
   -h --help               show this help message and exit
   --version               print the version number
 
-Required Arugments:
+Required Arguments:
   -i BAM                  BAM file
 
-SV Arugments:  
+SV Arguments:  
   -r REGION               breakpoint [chr:start-end]
   -t SVTYPE               SV type. Required if -r is defined. [DEL|DUP|INV|INS]
   -v VCF                  VCF file
