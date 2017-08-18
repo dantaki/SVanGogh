@@ -106,7 +106,7 @@ class Painter():
 			scaled='{}_{}_{}_{}_{}_scaled.png'.format(Args.ofh,SV.chrom,SV.start,SV.end,SV.svtype)
 			dat='{}_{}_{}_{}_{}_pixels.txt'.format(Args.ofh,SV.chrom,SV.start,SV.end,SV.svtype)
 			img_unscaled=smp.toimage(self.readPix)
-			img_scaled=smp.toimage(smp.imresize(self.readPix,(self.iheight,self.iwidth)))
+			img_scaled=smp.toimage(smp.imresize(self.readPix,(int(self.iheight),int(self.iwidth))))
 			img_unscaled.save(unscaled)
 			img_scaled.save(scaled)
 			ofh = open(dat,'w')

@@ -18,41 +18,55 @@ Pixelate SVs!
 ```
 $ svangogh --help
 
-usage: svangogh [-h] -i I [-r R] [-b B] [-v V] [-t T] [-ci] [-w W] [-c C]
-                [-x X] [-f F] [-n N] [-m M] [-X X] [-s S] [-hs HS] [-ws WS]
-                [-V] [-P] [-o O]
+---------------------------------------------------------
+8""""8  88   8                8""""8                   
+8       88   8  eeeee  eeeee  8    "  eeeee  eeeee  e   e 
+8eeeee  88  e8  8   8  8   8  8e      8  88  8   8  8   8 
+    88  "8  8   8eee8  8e  8  88  ee  8   8  8e     8eee8 
+e   88   8  8   88  8  88  8  88   8  8   8  88 "8  88  8 
+8eee88   8ee8   88  8  88  8  88eee8  8eee8  88ee8  88  8
 
-svangogh     --paint SV breakpoints--
+pixelate SVs         Author:Danny Antaki dantaki@ucsd.edu
+---------------------------------------------------------
 
-optional arguments:
-  -h, --help    show this help message and exit
+Usage: svangogh (-i BAM) [-r REGION] [-t SVTYPE] [-v VCF] [-b BED] 
+                         [--ci] [-w WINDOW] [-c CLIP] [--min-indel INDEL] 
+                         [-f FLANK] [--max-reads MAXREADS] [--max-mapq MAXMAPQ] [--min-sr MINSR] 
+                         [-s SCALE] [--hs HSCALE] [--ws WSCALE] 
+                         [-V --verbose] [-P] [-o OUT] [-h --help]
 
-required arguments:
-  -i I          BAM file
+  -h --help               show this help message and exit
+  --version               print the version number
 
-SV arguments:
-  -r R          Breakpoint <chr:start-end>
-  -b B          Breakpoint BED file, tab-delimited, <chr start end type>
-  -v V          VCF file
-  -t T          SV type <DEL|DUP|INV|INS>
-  -ci           Search for clips within confidence intervals. Requires VCF. Overrides <-c>
-  -w W          Flanking bp to search for supporting reads. [100]
-  -c C          Maximum clipped distance to breakpoint. [50]
-  -x X          Minimum INDEL size. [7]
+Required Arugments:
+  -i BAM                  BAM file
 
-SV painting arguments:
-  -f F          Flanking bp to paint. [20]
-  -n N          Maximum number of reads to paint. [10]
-  -m M          Maximum MAPQ. [Maximum in sample of reads]
-  -X X          Minimum number of supporting reads. [0]
-  -s S          Scaling multiplier. Adjust the scaled image size. [5]
-  -hs HS        Height scaling multiplier. Adjust the height of the scaled image size. [5]
-  -ws WS        Width scaling multiplier. Adjust the width of the scaled image size [5].
+SV Arugments:  
+  -r REGION               breakpoint [chr:start-end]
+  -t SVTYPE               SV type. Required if -r is defined. [DEL|DUP|INV|INS]
+  -v VCF                  VCF file
+  -b BED                  BED file
 
-Optional arguments:
-  -V            Verbose.
-  -P            Display a progress bar.
-  -o O, -out O  output
+SV Options:
+  --ci                    search for clips within confidence intervals, requires -v, overrides -c
+  -w WINDOW               flanking bp to search for supporting reads [default: 100]
+  -c CLIP                 maximum distance of clipped position to breakpoint [default: 50]
+  --min-indel INDEL       minimum indel size [default: 7]
+
+Pixelating Options:  
+  -f FLANK                flanking bp to paint [default: 20]
+  --max-reads MAXREADS    maximum number of reads to paint [default: 10]
+  --max-mapq MAXMAPQ      maximum MAPQ [Maximum in sample of reads]
+  --min-sr MINSR          minimum number of supporting reads [default: 0]
+  -s SCALE                scaling multiplier, adjust the scaled image size [default: 5]
+  --hs HSCALE             height scaling multiplier, adjust scaled image height [default: 5]
+  --ws WSCALE             width scaling multiplier, adjust scaled image width [default: 5]
+
+Options:  
+  -V --verbose            verbose mode
+  -P                      display a progress bar
+  -o OUT                  output prefix [default: svangogh]
+
 ```
 
 ## Output
