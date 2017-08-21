@@ -14,7 +14,6 @@ class SV():
 		self.chrom=c
 		self.start=int(s)
 		self.end=int(e)
-		if self.end == 0: self.end=self.start+1
 		self.svtype=cl
 		self.leftCI=(self.start+leftCI[0],self.start+leftCI[1])
 		self.rightCI=(self.end+rightCI[0],self.end+rightCI[1])

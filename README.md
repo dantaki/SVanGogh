@@ -30,43 +30,45 @@ pixelate SVs         Author:Danny Antaki dantaki@ucsd.edu
 ---------------------------------------------------------
 
 Usage: svangogh (-i BAM) [-r REGION] [-t SVTYPE] [-v VCF] [-b BED] 
-                         [--ci] [-w WINDOW] [-c CLIP] [--min-inv MININV] [--min-indel INDEL] 
-                         [-f FLANK] [--max-reads MAXREADS] [--max-mapq MAXMAPQ] [--min-sr MINSR] 
-                         [-s SCALE] [--hs HSCALE] [--ws WSCALE] 
+                         [--ci] [-w WINDOW] [-c CLIP] 
+                         [--min-ovr MINOVR] [--min-inv MININV] [--min-indel INDEL]
+                         [--max-reads MAXREADS] [--max-mapq MAXMAPQ] [--min-sr MINSR] 
+                         [-f FLANK] [-s SCALE] [--hs HSCALE] [--ws WSCALE] 
                          [-V --verbose] [-P] [-o OUT] [-h --help]
 
-  -h --help               show this help message and exit
-  --version               print the version number
+  -h --help             show this help message and exit
+  --version             print the version number
 
 Required Arguments:
-  -i BAM                  BAM file
+  -i BAM                BAM file
 
 SV Arguments:  
-  -r REGION               breakpoint [chr:start-end]
-  -t SVTYPE               SV type. Required if -r is defined. [DEL|DUP|INV|INS]
-  -v VCF                  VCF file
-  -b BED                  BED file
+  -r REGION             breakpoint [chr:start-end]
+  -t SVTYPE             SV type, required if -r is used. [DEL|DUP|INV|INS]
+  -v VCF                VCF file
+  -b BED                BED file
 
 SV Options:
-  --ci                    search for clips within confidence intervals, requires -v, overrides -c
-  -w WINDOW               flanking bp to search for supporting reads [default: 100]
-  -c CLIP                 maximum distance of clipped position to breakpoint [default: 50]
-  --min-inv MININV        minimum overlap of the alignment to inversion, flags supporting reads [default: 0.5]
-  --min-indel INDEL       minimum indel size [default: 7]
+  --ci                  flag clips within confidence intervals, requires -v, overrides -c
+  -w WINDOW             analyze reads +/- bp from breakpoints [default: 100]
+  -c CLIP               max distance of clips to breakpoint [default: 50]
+  --min-ovr MINOVR      min SV overlap, flags clips with CIGAR strings [default: 0.8]
+  --min-inv MININV      min alignment overlap to inversion, flags supporting reads [default: 0.5]
+  --min-indel INDEL     min indel size [default: 7]
 
 Pixelating Options:  
-  -f FLANK                flanking bp to paint [default: 20]
-  --max-reads MAXREADS    maximum number of reads to paint [default: 10]
-  --max-mapq MAXMAPQ      maximum MAPQ [Maximum in sample of reads]
-  --min-sr MINSR          minimum number of supporting reads [default: 0]
-  -s SCALE                scaling multiplier, adjust the scaled image size [default: 5]
-  --hs HSCALE             height scaling multiplier, adjust scaled image height [default: 5]
-  --ws WSCALE             width scaling multiplier, adjust scaled image width [default: 5]
+  -f FLANK              flanking bp to paint [default: 20]
+  --max-reads MAXREADS  max number of reads to pixelate [default: 10]
+  --max-mapq MAXMAPQ    max MAPQ [Maximum in subsample]
+  --min-sr MINSR        min number of supporting reads [default: 0]
+  -s SCALE              scaling multiplier, adjusts the image size [default: 5]
+  --hs HSCALE           height scaling multiplier, adjusts scaled height [default: 5]
+  --ws WSCALE           width scaling multiplier, adjusts scaled width [default: 5]
 
 Options:  
-  -V --verbose            verbose mode
-  -P                      display a progress bar
-  -o OUT                  output prefix [default: svangogh]
+  -V --verbose          verbose mode
+  -P                    display a progress bar
+  -o OUT                output prefix [default: svangogh]
 ```
 
 ## Output

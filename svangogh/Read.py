@@ -19,18 +19,19 @@ class Read():
 		if strand=='+': self.forward+=1
 		else: self.reverse+=1
 	def loadAlignments(self,aln): self.alignments.append(aln)
-	def pixelPrep(self,MAX=None,start=None,end=None,minInv=None):
+	def pixelPrep(self,MAX=None,start=None,end=None,svtype=None,minInv=None):
 		self.countStrands()
-		self.prepAlignments(MAX,start,end,minInv)
+		self.prepAlignments(MAX,start,end,svtype,minInv)
 		self.scoreAlignments()
 	def countStrands(self):
 		self.strandPix='+'
 		if self.reverse > self.forward: self.strandPix='-'
 		if self.forward>0 and self.reverse>0: self.sameStrand=False
-	def prepAlignments(self,MAX=None,start=None,end=None,minInv=None):
+	def prepAlignments(self,MAX=None,start=None,end=None,svtype=None,minInv=None):
 		q=[]		
 		for Aln in self.alignments:
 			q.append(Aln.mapq)
+			if svtype != 'INV': continue
 			if self.sameStrand==True: continue
 			invpos=len([x for x in Aln.pos if start<=x<=end])
 			outpos = len(Aln.pos)-invpos
