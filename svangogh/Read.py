@@ -6,10 +6,10 @@ class Read():
 		self.alignments=[]
 		self.forward=0
 		self.reverse=0
-		self.inversion=False
+		self.inversion=None
 		self.insertion=None
 		self.strandPix=None
-		self.sameStrand=None
+		self.sameStrand=True
 		self.startClip=None
 		self.endClip=None
 		self.mapq=None

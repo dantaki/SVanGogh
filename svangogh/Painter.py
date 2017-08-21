@@ -95,9 +95,10 @@ class Painter():
 		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.samePix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.samePix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.diffPix)
-		for x in self.order[0:MAX]: self.readPix.append(self.pix[x])
+		for x in self.order[0:MAX]: 
+			self.readPix.append(self.pix[x])
 		for x in range(MAX-len(self.readPix)): self.readPix.append(self.zeroPix())
-	def printSupportingReads(self,svtype=None,minSR=None):
+	def printSupportingReads(self,svtype=None,minSR=None,SV=None):
 		printbool=False
 		if minSR>0:
 			if svtype=='INS' and len(self.insAln)>=minSR: printbool=True
@@ -106,7 +107,7 @@ class Painter():
 		else: printbool=True
 		return printbool
 	def printPixels(self,SV=None,Args=None):
-		if self.printSupportingReads(SV.svtype,Args.minSR) == True:
+		if self.printSupportingReads(SV.svtype,Args.minSR,SV) == True:
 			unscaled='{}_{}_{}_{}_{}_unscaled.png'.format(Args.ofh,SV.chrom,SV.start,SV.end,SV.svtype)
 			scaled='{}_{}_{}_{}_{}_scaled.png'.format(Args.ofh,SV.chrom,SV.start,SV.end,SV.svtype)
 			dat='{}_{}_{}_{}_{}_pixels.txt'.format(Args.ofh,SV.chrom,SV.start,SV.end,SV.svtype)
