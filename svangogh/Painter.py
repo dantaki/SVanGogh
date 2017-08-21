@@ -1,13 +1,14 @@
 from Canvas import Canvas
 import scipy.misc as smp
 from operator import itemgetter
-def pixelUnion(tmp,pix):
+def pixelUnion(tmp,pix,svtype):
 	unionPix=[]
 	for i in xrange(len(tmp)):
 		if tmp[i] == [0,0,0] and pix[i]==[0,0,0]:unionPix.append([0,0,0])
 		if tmp[i] != [0,0,0] and pix[i]==[0,0,0]:unionPix.append(tmp[i])
 		if tmp[i] == [0,0,0] and pix[i]!=[0,0,0]:unionPix.append(pix[i])
-		if tmp[i] != [0,0,0] and pix[i]!=[0,0,0]:unionPix.append([max(tmp[i][0],pix[i][0]),max(tmp[i][1],pix[i][1]),max(tmp[i][2],pix[i][2])])
+		if tmp[i] != [0,0,0] and pix[i]!=[0,0,0] and svtype!='INV':unionPix.append([max(tmp[i][0],pix[i][0]),max(tmp[i][1],pix[i][1]),max(tmp[i][2],pix[i][2])])
+		if tmp[i] != [0,0,0] and pix[i]!=[0,0,0] and svtype=='INV':unionPix.append([max(tmp[i][0],pix[i][0]),max(tmp[i][1],pix[i][1]),min(tmp[i][2],pix[i][2])])
 	return unionPix
 def appendOrder(i,o,t):
 	for x in sorted(i, key=itemgetter(0)):
@@ -43,7 +44,7 @@ class Painter():
 		if mapq > 255: mapq=255
 		return mapq
 	def zeroPix(self): return [[0,0,0] for x in self.canvas]
-	def svPainter(self,reads=None):
+	def svPainter(self,reads=None,svtype=None):
 		self.mapped=127.5
 		self.clip=255
 		for name in reads:
@@ -71,7 +72,7 @@ class Painter():
 						elif x!=Aln.startClip and x!=Aln.endClip and x in Aln.pos: tmp.append([self.mapped,mapq,strandPix])
 						elif x not in Aln.pos: tmp.append([self.unmapped,self.unmapped,self.unmapped])
 				if self.pix.get(name)==None: self.pix[name]=tmp
-				else: self.pix[name]=pixelUnion(tmp,self.pix[name])
+				else: self.pix[name]=pixelUnion(tmp,self.pix[name],svtype)
 	def orderPixels(self,MAX):
 		if len(self.insAln)>0: 
 			appendOrder(self.twoClip,self.order,list(set(self.insAln)&set(self.samePix)))
