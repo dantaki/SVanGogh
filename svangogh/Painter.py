@@ -48,11 +48,11 @@ class Painter():
 		self.clip=255
 		for name in reads:
 			Read=reads[name]
-			if Read.inversion!=None: self.invAln.append((Read.inversion,name))
+			if Read.inversion!=None: self.invAln.append((Read.inversion-Read.clips,name))
 			if Read.insertion!=None: self.insAln.append(name)			
-			if Read.startClip!=None and Read.endClip!=None: self.twoClip.append((Read.mapq+Read.score,name))
-			elif (Read.startClip!=None and Read.endClip==None) or (Read.startClip==None and Read.endClip!=None): self.oneClip.append((Read.mapq+Read.score,name)) 
-			else: self.mappedAln.append((Read.mapq,name))
+			if Read.startClip!=None and Read.endClip!=None: self.twoClip.append(((Read.mapq+Read.score)-Read.clips,name))
+			elif (Read.startClip!=None and Read.endClip==None) or (Read.startClip==None and Read.endClip!=None): self.oneClip.append(((Read.mapq+Read.score)-Read.clips,name)) 
+			else: self.mappedAln.append((Read.mapq-Read.clips,name))
 			if Read.sameStrand==True: self.samePix.append(name) 
 			else: self.diffPix.append(name)
 			for Aln in Read.alignments:

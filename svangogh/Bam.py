@@ -8,14 +8,12 @@ from operator import itemgetter
 def unionize(reads,qname,qAln):
 	if reads.get(qname)!= None:
 		read = reads[qname]
-		read.strandIncrement(qAln.strand)
-		read.loadAlignments(qAln)
+		read.loadAlignments(qAln,qAln.strand)
 		reads[qname]=read
 	else:
 		read=Read()
 		read.label(qname)
-		read.strandIncrement(qAln.strand)
-		read.loadAlignments(qAln)
+		read.loadAlignments(qAln,qAln.strand)
 		reads[qname]=read
 	return reads
 class Bam():
@@ -93,7 +91,13 @@ class Bam():
 			Read=self.reads[name]
 			start,end=[],[]
 			for Aln in Read.alignments:
-				if Aln.startClip!=None: start.append(abs(Aln.startClip-self.medStart))
-				if Aln.endClip!=None: end.append(abs(Aln.endClip-self.medEnd))
+				if Aln.startClip!=None: 
+					start.append(abs(Aln.startClip-self.medStart))
+					Read.clips+=1
+				if Aln.endClip!=None: 
+					Read.clips+=1
+					end.append(abs(Aln.endClip-self.medEnd))
 			if len(start)>0: Read.startClip=sorted(start).pop(0)	
 			if len(end)>0: Read.endClip=sorted(end).pop(0)
+			score=sum([x for x in [Read.startClip,Read.endClip] if x!= None])
+			if Read.startClip!=None or Read.endClip!=None: Read.score=score

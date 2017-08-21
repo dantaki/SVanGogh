@@ -6,6 +6,7 @@ class Read():
 		self.alignments=[]
 		self.forward=0
 		self.reverse=0
+		self.clips=0
 		self.inversion=None
 		self.insertion=None
 		self.strandPix=None
@@ -14,15 +15,14 @@ class Read():
 		self.endClip=None
 		self.mapq=None
 		self.score=None
-	def label(self,name): self.name=name
-	def strandIncrement(self,strand=None):
+	def label(self,name): self.name=name		
+	def loadAlignments(self,aln,strand): 
 		if strand=='+': self.forward+=1
 		else: self.reverse+=1
-	def loadAlignments(self,aln): self.alignments.append(aln)
+		self.alignments.append(aln)
 	def pixelPrep(self,MAX=None,start=None,end=None,svtype=None,minInv=None):
 		self.countStrands()
 		self.prepAlignments(MAX,start,end,svtype,minInv)
-		self.scoreAlignments()
 	def countStrands(self):
 		self.strandPix='+'
 		if self.reverse > self.forward: self.strandPix='-'
@@ -44,6 +44,3 @@ class Read():
 		mapq=np.median(q)
 		if mapq>MAX:mapq=MAX
 		self.mapq=abs(MAX-mapq)
-	def scoreAlignments(self): 
-		score=sum([x for x in [self.startClip,self.endClip] if x!= None])
-		if self.startClip!=None or self.endClip!=None: self.score=score
