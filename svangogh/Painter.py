@@ -16,6 +16,7 @@ def appendOrder(i,o,t):
 class Painter():
 	def __init__(self,Args=None):
 		self.canvas=[]
+		self.invFlag=0 # 0 : no INV, 1 : INV, 2: INV + other strand, 3: INV + other strand + pixelated
 		self.samePix=[] # [ReadName]=[ readPix ]
 		self.diffPix=[]
 		self.twoClip=[]
@@ -56,12 +57,16 @@ class Painter():
 			else: self.mappedAln.append((Read.mapq-Read.clips,name))
 			if Read.sameStrand==True: self.samePix.append(name) 
 			else: self.diffPix.append(name)
+			if svtype=='INV': self.invFlag=1
 			for Aln in Read.alignments:
 				tmp=[]
 				mapq=self.transformMapq(Aln.mapq)
 				strandPix=self.strandMatch
-				if Read.strandPix != Aln.strand: strandPix=self.strandDif
+				if Read.strandPix != Aln.strand: 
+					if self.invFlag==1: self.invFlag=2
+					strandPix=self.strandDif
 				for x in self.canvas:
+					if self.invFlag==2: self.invFlag=3
 					if x<0:
 						if Read.insertion==None: tmp.append([self.unmapped,self.unmapped,self.unmapped])
 						elif Read.insertion!=None:
@@ -96,20 +101,19 @@ class Painter():
 		if len(self.twoClip)>0: appendOrder(self.twoClip,self.order,self.samePix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.samePix)
 		if len(self.mappedAln)>0: appendOrder(self.mappedAln,self.order,self.diffPix)
-		for x in self.order[0:MAX]: 
-			self.readPix.append(self.pix[x])
+		for x in self.order[0:MAX]: self.readPix.append(self.pix[x])
 		for x in range(MAX-len(self.readPix)): self.readPix.append(self.zeroPix())
 	def printSupportingReads(self,svtype=None,minSR=None,SV=None):
 		printbool=False
 		if minSR>0:
 			if svtype=='INS' and len(self.insAln)>=minSR: printbool=True
 			elif (svtype=='DEL' or svtype=='DUP') and len(self.twoClip)>=minSR: printbool=True
-			elif svtype=='INV' and len(list(set([x[1] for x in self.twoClip+self.oneClip])&set([x[1] for x in self.invAln])))>=minSR: printbool=True
+			elif svtype=='INV' and len(list(set([x[1] for x in self.twoClip+self.oneClip])&set([x[1] for x in self.invAln])))>=minSR and self.invFlag==3: printbool=True
 		else: printbool=True
 		return printbool
 	def printPixels(self,SV=None,Args=None):
 		if self.printSupportingReads(SV.svtype,Args.minSR,SV) == True:
-			unscaled='{}_{}_{}_{}_{}_unscaled.png'.format(Args.ofh,SV.chrom,SV.start,SV.end,SV.svtype)
+			unscaled='{}_{}_{}_{}_{}.png'.format(Args.ofh,SV.chrom,SV.start,SV.end,SV.svtype)
 			scaled='{}_{}_{}_{}_{}_scaled.png'.format(Args.ofh,SV.chrom,SV.start,SV.end,SV.svtype)
 			dat='{}_{}_{}_{}_{}_pixels.txt'.format(Args.ofh,SV.chrom,SV.start,SV.end,SV.svtype)
 			img_unscaled=smp.toimage(self.readPix)
