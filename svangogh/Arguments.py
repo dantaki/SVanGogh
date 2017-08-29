@@ -38,7 +38,7 @@ SV Options:
   --min-indel INDEL     min indel size [default: 7]
 
 Pixelating Options:  
-  -f FLANK              flanking bp to paint [default: 50]
+  -f FLANK              flanking bp to paint [default: 250]
   --max-reads MAXREADS  max number of reads to pixelate [default: 10]
   --max-mapq MAXMAPQ    max MAPQ [Maximum in subsample]
   --min-sr MINSR        min number of supporting reads [default: 0]
@@ -77,6 +77,9 @@ class Arguments():
 	    self.maxFlank,self.maxReads,self.maxMapq,self.minSR = int(arg['-f']),int(arg['--max-reads']),arg['--max-mapq'],int(arg['--min-sr'])
 	    self.scaling,self.hscaling,self.wscaling = float(arg['-s']),float(arg['--hs']),float(arg['--ws'])
 	    self.verbose,self.progress,self.ofh = arg['--verbose'],arg['-P'],arg['-o']
+	    if self.maxFlank < 50: 
+	    	self.maxFlank=250
+	    	sys.stderr.write('WARNING: flank:{} cannot be less than 50bp... setting flank value to default:250bp\n'.format(arg['-f']))
 	    if self.verbose==0: self.verbose=False 
 	    else: self.verbose=True
 	    if self.maxMapq==None:

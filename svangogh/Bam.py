@@ -24,6 +24,8 @@ class Bam():
 		self.clips=None
 		self.medStart=None
 		self.medEnd=None
+		self.startClips=None # (minClip,maxClip)
+		self.endClips=None   # (minClip,maxClip)
 		self.verbose=Args.verbose
 		self.hasIns=False
 		READS={}
@@ -78,14 +80,18 @@ class Bam():
 		start = [x[0] for x in self.clips if x[0] != None]
 		end= [x[1] for x in self.clips if x[1] != None]
 		if SV.svtype!='INS':
-			if len(start)>0: self.medStart=int(np.median(start))
-			else: self.medStart=SV.start
-			if len(end)>0: self.medEnd=int(np.median(end))
-			else: self.medEnd=SV.end
+			if len(start)>0: self.medStart, self.startClips = int(np.median(start)), (min(start),max(start))
+			else: self.medStart, self.startClips =SV.start , (SV.start,SV.start)
+			if len(end)>0: self.medEnd, self.endClips =int(np.median(end)), (min(end),max(end))
+			else: self.medEnd, self.endClips =SV.end, (SV.end,SV.end)
 		else: 
 			start=sorted(start)
-			if len(start)>0: self.medStart,self.medEnd = start[0],start[-1]
-			else: self.medStart,self.medEnd=SV.start,SV.start+1 
+			if len(start)>0: self.medStart,self.medEnd, self.startClips, self.endClips = start[0],start[-1],(min(start),max(start)),(min(start),max(start))
+			else: self.medStart,self.medEnd, self.startClips,self.endClips=SV.start,SV.end,(SV.start,SV.start),(SV.end,SV.end)
+		if self.endClips[0]<= self.startClips[1]:
+			tmp = self.endClips[0]
+			self.endClips[0],self.startClips[1]=self.startClips[1],tmp
+			if self.endClips[0]==self.startClips[1]: self.endClips[0]+=1
 	def assignClips(self):
 		for name in self.reads:
 			Read=self.reads[name]

@@ -57,7 +57,7 @@ SV Options:
   --min-indel INDEL     min indel size [default: 7]
 
 Pixelating Options:  
-  -f FLANK              flanking bp to paint [default: 50]
+  -f FLANK              flanking bp to paint [default: 250]
   --max-reads MAXREADS  max number of reads to pixelate [default: 10]
   --max-mapq MAXMAPQ    max MAPQ [Maximum in subsample]
   --min-sr MINSR        min number of supporting reads [default: 0]
