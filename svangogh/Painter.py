@@ -57,7 +57,7 @@ class Painter():
 			else: self.mappedAln.append((Read.mapq-Read.clips,name))
 			if Read.sameStrand==True: self.samePix.append(name) 
 			else: self.diffPix.append(name)
-			if svtype=='INV': self.invFlag=1
+			if Read.inversion!=None: self.invFlag=1
 			for Aln in Read.alignments:
 				tmp=[]
 				mapq=self.transformMapq(Aln.mapq)
@@ -108,7 +108,8 @@ class Painter():
 		printbool=False
 		if minSR>0:
 			if svtype=='INS' and len(self.insAln)>=minSR: printbool=True
-			elif (svtype=='DEL' or svtype=='DUP') and len(self.twoClip)>=minSR: printbool=True
+			elif svtype=='DEL' and len(self.twoClip)>=minSR: printbool=True
+			elif svtype=='DUP' and len(self.twoClip+self.oneClip)>=minSR: printbool=True
 			elif svtype=='INV' and len(list(set([x[1] for x in self.twoClip+self.oneClip])&set([x[1] for x in self.invAln])))>=minSR and self.invFlag==3: printbool=True
 		else: printbool=True
 		return printbool
