@@ -12,8 +12,8 @@ class SV():
 		self.rightCI=(self.end+rightCI[0],self.end+rightCI[1])
 		self.region='{}:{}-{}'.format(self.chrom,self.start,self.end)
 		self.qc=0 #Fail
-		if self.qc()==False: self.qc=1
-	def qc(self):
+		if self.checkQC()==False: self.qc=1
+	def checkQC(self):
 		skip=False
 		if self.svtype!='DEL' and self.svtype!='DUP' and self.svtype!='INV' and self.svtype!='INS':
 			skip=True
