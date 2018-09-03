@@ -1,6 +1,9 @@
 # SVanGogh
 Pixelate SVs!
 
+:construction::warning: **WIP** :warning::construction:
+I am currently NOT developing this software. If you use this software or methodology please cite my thesis (soon).
+
 ## Install
 
 1. `git clone --recursive https://github.com/dantaki/SVanGogh`
@@ -12,6 +15,7 @@ Pixelate SVs!
 * pysam
 * scipy
 * tqdm 
+
 
 ## Usage
 
